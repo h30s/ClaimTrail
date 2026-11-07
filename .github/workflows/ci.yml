@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://claimtrail:claimtrail@localhost:5432/claimtrail
+      DIRECT_URL: postgresql://claimtrail:claimtrail@localhost:5432/claimtrail
+      BETTER_AUTH_SECRET: ci-test-secret-value-32-chars-long!!
+      BETTER_AUTH_URL: http://localhost:3000
+      GEMINI_API_KEY: ci-placeholder-key
+      STORAGE_DRIVER: local
+      DEMO_MODE: "true"
+      DEMO_PASSWORD: ci-demo-password
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm build
