@@ -1,0 +1,558 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ───────────────────────── Enums ─────────────────────────
+
+enum Role {
+  DESK_HEAD
+  DESK_EXECUTIVE
+}
+
+enum PayerKind {
+  INSURER
+  TPA
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+/// Which document set is active. "Final bill" in the brief = DISCHARGE.
+enum Stage {
+  PRE_AUTH
+  ENHANCEMENT
+  DISCHARGE
+}
+
+/// Where the current stage stands. Ball-in-court is derived from this (A5).
+enum ClaimStatus {
+  DRAFT
+  SENT
+  QUERY
+  APPROVED
+  REJECTED
+  SETTLED
+}
+
+enum Requirement {
+  REQUIRED
+  OPTIONAL
+  NOT_NEEDED
+}
+
+enum DocumentStatus {
+  PROCESSING
+  SORTED
+  NEEDS_REVIEW
+}
+
+enum SortedBy {
+  AI
+  USER
+}
+
+/// Result of comparing the patient name on a document with the claim's patient.
+enum IdentityCheck {
+  UNCHECKED  // no name found on the document
+  MATCH
+  MISMATCH   // shown as a warning; blocks the slot until resolved
+  CONFIRMED  // a user confirmed the document belongs to this patient
+}
+
+enum ClaimEventType {
+  CREATED
+  SUBMITTED
+  QUERY_RAISED
+  QUERY_ANSWERED
+  APPROVED
+  REJECTED
+  STAGE_STARTED
+  SETTLED
+  ASSIGNED
+}
+
+enum QueryStatus {
+  OPEN
+  ANSWERED
+}
+
+enum DeadlineSource {
+  STATED   // the email gave a deadline
+  DEFAULT  // payer default reply window (A8)
+}
+
+enum AiState {
+  OK
+  FAILED
+}
+
+enum DeductionReason {
+  MISSING_DOCUMENT
+  NON_PAYABLE_ITEM
+  ROOM_RENT_LIMIT
+  TARIFF_DIFFERENCE
+  CO_PAYMENT
+  OTHER
+}
+
+enum AiTask {
+  ANALYSE_DOCUMENT
+  SUMMARISE_QUERY
+}
+
+enum AiRunStatus {
+  OK
+  INVALID_OUTPUT
+  REFUSED
+  ERROR
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  CHANGES_REQUESTED
+}
+
+// ───────────────────────── Auth (Better Auth) ─────────────────────────
+// Generated shape from `npx @better-auth/cli generate`, plus `role` and `active`.
+
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  role          Role      @default(DESK_EXECUTIVE)
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  assignedClaims  Claim[]          @relation("ClaimAssignee")
+  uploads         Document[]       @relation("DocumentUploader")
+  claimEvents     ClaimEvent[]
+  confirmedFields ClaimField[]
+  auditEvents     AuditEvent[]
+  rulesUpdated    ChecklistRule[]
+  submissions     Submission[]
+  replies         TpaQuery[]       @relation("QueryReplier")
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verification")
+}
+
+model RateLimit {
+  id          String @id
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+
+  @@map("rate_limit")
+}
+
+// ───────────────────────── Catalog (admin-managed) ─────────────────────────
+
+/// Insurer or TPA. emailDomain lets us match incoming query emails to a payer.
+model Payer {
+  id              String    @id @default(cuid())
+  name            String    @unique
+  kind            PayerKind
+  emailDomain     String    @unique
+  queryReplyHours Int       @default(24) // A8
+  active          Boolean   @default(true)
+
+  claims  Claim[]
+  rules   ChecklistRule[]
+  queries TpaQuery[]
+
+  @@map("payer")
+}
+
+model Procedure {
+  id     String  @id @default(cuid())
+  name   String  @unique
+  active Boolean @default(true)
+
+  claims Claim[]
+  rules  ChecklistRule[]
+
+  @@map("procedure")
+}
+
+/// `key` is stable and is what the AI returns. `description` doubles as the AI hint,
+/// so an admin can improve sorting by editing plain English.
+model DocumentType {
+  id          String  @id @default(cuid())
+  key         String  @unique
+  label       String
+  description String
+  sortOrder   Int     // packet order (A22)
+  active      Boolean @default(true)
+
+  rules     ChecklistRule[]
+  documents Document[]
+  asks      QueryAsk[]
+
+  @@map("document_type")
+}
+
+/// One line of the admin's checklist matrix. null payerId / procedureId = "all".
+/// Unique per scope+stage+type, with NULLS NOT DISTINCT (added by hand in the migration SQL).
+model ChecklistRule {
+  id             String      @id @default(cuid())
+  payerId        String?
+  procedureId    String?
+  stage          Stage
+  documentTypeId String
+  requirement    Requirement
+  needsFreshCopy Boolean     @default(false) // A7
+  note           String?
+  updatedById    String
+  updatedAt      DateTime    @updatedAt
+
+  payer        Payer?       @relation(fields: [payerId], references: [id])
+  procedure    Procedure?   @relation(fields: [procedureId], references: [id])
+  documentType DocumentType @relation(fields: [documentTypeId], references: [id])
+  updatedBy    User         @relation(fields: [updatedById], references: [id])
+
+  @@index([payerId, procedureId])
+  @@map("checklist_rule")
+}
+
+// ───────────────────────── Claims ─────────────────────────
+
+model Patient {
+  id          String   @id @default(cuid())
+  uhid        String   @unique // hospital patient ID (synthetic)
+  name        String
+  gender      Gender
+  dateOfBirth DateTime @db.Date
+
+  claims Claim[]
+
+  @@map("patient")
+}
+
+model Claim {
+  id              String      @id @default(cuid())
+  code            String      @unique // "CLM-3381", used in URLs and emails
+  patientId       String
+  payerId         String
+  procedureId     String
+  policyNumber    String
+  payerReference  String?     // payer's own claim/auth number, for matching emails
+  treatingDoctor  String
+  admittedAt      DateTime
+  stage           Stage       @default(PRE_AUTH)
+  status          ClaimStatus @default(DRAFT)
+  stageStartedAt  DateTime    @default(now())
+  statusChangedAt DateTime    @default(now())
+  estimatedAmount Int         // ₹, A12
+  approvedAmount  Int?
+  billedAmount    Int?
+  settledAmount   Int?
+  assigneeId      String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  patient     Patient   @relation(fields: [patientId], references: [id])
+  payer       Payer     @relation(fields: [payerId], references: [id])
+  procedure   Procedure @relation(fields: [procedureId], references: [id])
+  assignee    User?     @relation("ClaimAssignee", fields: [assigneeId], references: [id])
+
+  events          ClaimEvent[]
+  documents       Document[]
+  suggestions     FieldSuggestion[]
+  fields          ClaimField[]
+  queries         TpaQuery[]
+  submissions     Submission[]
+  deductions      Deduction[]
+  doctorApprovals DoctorApproval[]
+
+  @@index([assigneeId, status])
+  @@index([status, stage])
+  @@index([payerId])
+  @@map("claim")
+}
+
+/// Append-only. Stores the state AFTER the event, so clocks can be rebuilt from the list alone.
+model ClaimEvent {
+  id      String         @id @default(cuid())
+  claimId String
+  type    ClaimEventType
+  stage   Stage
+  status  ClaimStatus
+  at      DateTime       @default(now())
+  actorId String?
+  note    String?
+  data    Json?          // e.g. { amount }, { overrideReason }, { queryId }
+
+  claim Claim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([claimId, at])
+  @@map("claim_event")
+}
+
+/// A file attached to a claim. documentTypeId null = in the "Needs sorting" tray.
+/// The AI's own guess is kept even after a user moves it, so we can measure AI accuracy.
+model Document {
+  id                String         @id @default(cuid())
+  claimId           String
+  documentTypeId    String?
+  status            DocumentStatus @default(PROCESSING)
+  sortedBy          SortedBy?
+  fileName          String
+  mimeType          String
+  sizeBytes         Int
+  pageCount         Int?
+  storageKey        String         @unique
+  uploadedById      String
+  uploadedAt        DateTime       @default(now())
+  aiDocumentTypeKey String?
+  aiConfidence      Float?
+  aiReason          String?
+  aiAlternatives    Json?          // [{ key, confidence }]
+  aiFailed          Boolean        @default(false)
+  patientNameOnDoc  String?
+  identityCheck     IdentityCheck  @default(UNCHECKED)
+  documentDate      DateTime?      @db.Date
+  deletedAt         DateTime?
+
+  claim        Claim             @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  documentType DocumentType?     @relation(fields: [documentTypeId], references: [id])
+  uploadedBy   User              @relation("DocumentUploader", fields: [uploadedById], references: [id])
+  suggestions  FieldSuggestion[]
+
+  @@index([claimId, documentTypeId])
+  @@map("document")
+}
+
+/// One AI-extracted candidate value for a pre-auth field. Several can exist per field (disagreement is shown).
+model FieldSuggestion {
+  id            String    @id @default(cuid())
+  claimId       String
+  fieldKey      String    // one of PREAUTH_FIELDS keys
+  value         String
+  sourceSnippet String
+  confidence    Float
+  documentId    String
+  createdAt     DateTime  @default(now())
+  dismissedAt   DateTime?
+
+  claim    Claim    @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([claimId, fieldKey])
+  @@map("field_suggestion")
+}
+
+/// The confirmed value. Exists only after a human clicked Confirm (brief: "needs a click to confirm").
+model ClaimField {
+  claimId       String
+  fieldKey      String
+  value         String
+  suggestionId  String?  // null when typed by hand
+  confirmedById String
+  confirmedAt   DateTime @default(now())
+
+  claim       Claim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  confirmedBy User  @relation(fields: [confirmedById], references: [id])
+
+  @@id([claimId, fieldKey])
+  @@map("claim_field")
+}
+
+// ───────────────────────── Queries (TPA emails) ─────────────────────────
+
+model TpaQuery {
+  id                  String         @id @default(cuid())
+  claimId             String?
+  payerId             String?
+  fromAddress         String
+  subject             String
+  body                String         @db.Text
+  receivedAt          DateTime
+  aiState             AiState
+  summary             String?
+  extractedClaimRef   String?
+  extractedPatient    String?
+  suggestedClaimId    String?        // set when matching was a guess, not exact
+  deadlineAt          DateTime
+  deadlineSource      DeadlineSource
+  deadlineSnippet     String?
+  status              QueryStatus    @default(OPEN)
+  replyBody           String?        @db.Text
+  replyDocumentIds    String[]
+  repliedAt           DateTime?
+  repliedById         String?
+  createdAt           DateTime       @default(now())
+
+  claim     Claim?     @relation(fields: [claimId], references: [id])
+  payer     Payer?     @relation(fields: [payerId], references: [id])
+  repliedBy User?      @relation("QueryReplier", fields: [repliedById], references: [id])
+  asks      QueryAsk[]
+
+  @@index([status, deadlineAt])
+  @@index([claimId])
+  @@map("tpa_query")
+}
+
+/// One thing the payer asked for. If it maps to a document type, it shows up in the claim's gap view.
+model QueryAsk {
+  id             String  @id @default(cuid())
+  queryId        String
+  position       Int
+  text           String
+  documentTypeId String?
+  sourceSnippet  String?
+
+  query        TpaQuery      @relation(fields: [queryId], references: [id], onDelete: Cascade)
+  documentType DocumentType? @relation(fields: [documentTypeId], references: [id])
+
+  @@map("query_ask")
+}
+
+// ───────────────────────── Submission, settlement ─────────────────────────
+
+/// What was sent, when, with the checklist as it was at that moment (rules can change later).
+model Submission {
+  id                String   @id @default(cuid())
+  claimId           String
+  stage             Stage
+  sentAt            DateTime @default(now())
+  sentById          String
+  documentIds       String[]
+  checklistSnapshot Json
+  overriddenGaps    Json?
+  overrideReason    String?
+
+  claim  Claim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  sentBy User  @relation(fields: [sentById], references: [id])
+
+  @@index([claimId])
+  @@map("submission")
+}
+
+model Deduction {
+  id      String          @id @default(cuid())
+  claimId String
+  reason  DeductionReason
+  amount  Int
+  note    String?
+
+  claim Claim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+
+  @@index([reason])
+  @@map("deduction")
+}
+
+// ───────────────────────── Observability, compliance ─────────────────────────
+
+model AiRun {
+  id            String      @id @default(cuid())
+  task          AiTask
+  model         String
+  promptVersion String
+  status        AiRunStatus
+  latencyMs     Int
+  inputTokens   Int?
+  outputTokens  Int?
+  error         String?
+  output        Json?
+  documentId    String?
+  queryId       String?
+  createdAt     DateTime    @default(now())
+
+  @@index([task, createdAt])
+  @@map("ai_run")
+}
+
+model AuditEvent {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String   // e.g. CLAIM_VIEWED, DOCUMENT_MOVED, RULE_UPDATED, CLAIM_SUBMITTED
+  entityType String
+  entityId   String
+  claimId    String?
+  data       Json?
+  at         DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([claimId, at])
+  @@index([actorId, at])
+  @@index([at])
+  @@map("audit_event")
+}
+
+/// Optional (Phase 7). Token is stored hashed; the raw token only ever exists in the link.
+model DoctorApproval {
+  id          String         @id @default(cuid())
+  claimId     String
+  doctorName  String
+  tokenHash   String         @unique
+  expiresAt   DateTime
+  status      ApprovalStatus @default(PENDING)
+  comment     String?
+  decidedAt   DateTime?
+  createdById String
+  createdAt   DateTime       @default(now())
+
+  claim Claim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+
+  @@index([claimId])
+  @@map("doctor_approval")
+}
