@@ -1,22 +1,33 @@
 import { z } from "zod";
 
+const optionalUrl = z
+  .string()
+  .optional()
+  .transform((v) => (v && v.trim().length > 0 ? v : undefined))
+  .pipe(z.string().url().optional());
+
+const optionalString = z
+  .string()
+  .optional()
+  .transform((v) => (v && v.trim().length > 0 ? v : undefined));
+
 const EnvSchema = z
   .object({
     DATABASE_URL: z.string().url(),
-    DIRECT_URL: z.string().url().optional(),
+    DIRECT_URL: optionalUrl,
     BETTER_AUTH_SECRET: z.string().min(32),
     BETTER_AUTH_URL: z.string().url(),
     GEMINI_API_KEY: z.string().min(1),
     GEMINI_MODEL: z.string().default("gemini-2.5-flash"),
     STORAGE_DRIVER: z.enum(["local", "supabase"]),
-    SUPABASE_URL: z.string().url().optional(),
-    SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+    SUPABASE_URL: optionalUrl,
+    SUPABASE_SERVICE_ROLE_KEY: optionalString,
     SUPABASE_STORAGE_BUCKET: z.string().default("claim-documents"),
     DEMO_MODE: z
       .enum(["true", "false"])
       .default("false")
       .transform((v) => v === "true"),
-    DEMO_PASSWORD: z.string().min(10).optional(),
+    DEMO_PASSWORD: optionalString,
   })
   .superRefine((e, ctx) => {
     if (e.STORAGE_DRIVER === "supabase" && (!e.SUPABASE_URL || !e.SUPABASE_SERVICE_ROLE_KEY)) {

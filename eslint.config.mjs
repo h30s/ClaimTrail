@@ -15,6 +15,12 @@ const eslintConfig = defineConfig([
       "max-lines": ["warn", { max: 220, skipBlankLines: true, skipComments: true }],
     },
   },
+  {
+    files: ["prisma/**", "scripts/**"],
+    rules: {
+      "no-console": "off",
+    },
+  },
   prettierConfig,
   globalIgnores([
     ".next/**",
