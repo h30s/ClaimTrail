@@ -6,6 +6,7 @@ import { SEED_USERS } from "./data/users";
 import { SEED_PAYERS } from "./data/payers";
 import { SEED_PROCEDURES } from "./data/procedures";
 import { SEED_DOCUMENT_TYPES } from "./data/document-types";
+import { SEED_CHECKLIST_RULES } from "./data/checklist-rules";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
@@ -19,7 +20,7 @@ const db = new PrismaClient({
 const DEMO_PASSWORD = process.env.DEMO_PASSWORD || "ClaimTrail2026!";
 
 async function main() {
-  console.log("Seeding initial catalog and demo users...");
+  console.log("Seeding catalog, rules, and demo users...");
 
   // Delete in reverse dependency order (wipe)
   await db.account.deleteMany();
@@ -46,8 +47,10 @@ async function main() {
 
   // 1. Users
   const hashedPassword = await hashPassword(DEMO_PASSWORD);
+  let meeraId = "";
   for (const u of SEED_USERS) {
     const id = crypto.randomUUID();
+    if (u.role === "DESK_HEAD") meeraId = id;
     await db.user.create({
       data: {
         id,
@@ -71,8 +74,9 @@ async function main() {
   console.log(`✓ Seeded ${SEED_USERS.length} users with demo credentials.`);
 
   // 2. Payers
+  const payerMap = new Map<string, string>();
   for (const p of SEED_PAYERS) {
-    await db.payer.create({
+    const created = await db.payer.create({
       data: {
         name: p.name,
         kind: p.kind,
@@ -80,20 +84,24 @@ async function main() {
         queryReplyHours: p.queryReplyHours,
       },
     });
+    payerMap.set(p.name, created.id);
   }
   console.log(`✓ Seeded ${SEED_PAYERS.length} payers.`);
 
   // 3. Procedures
+  const procedureMap = new Map<string, string>();
   for (const name of SEED_PROCEDURES) {
-    await db.procedure.create({
+    const created = await db.procedure.create({
       data: { name },
     });
+    procedureMap.set(name, created.id);
   }
   console.log(`✓ Seeded ${SEED_PROCEDURES.length} procedures.`);
 
   // 4. Document Types
+  const docTypeMap = new Map<string, string>();
   for (const dt of SEED_DOCUMENT_TYPES) {
-    await db.documentType.create({
+    const created = await db.documentType.create({
       data: {
         key: dt.key,
         label: dt.label,
@@ -101,10 +109,35 @@ async function main() {
         sortOrder: dt.sortOrder,
       },
     });
+    docTypeMap.set(dt.key, created.id);
   }
   console.log(`✓ Seeded ${SEED_DOCUMENT_TYPES.length} document types.`);
 
-  console.log("Phase 1 seeding completed successfully.");
+  // 5. Checklist Rules
+  for (const rule of SEED_CHECKLIST_RULES) {
+    const documentTypeId = docTypeMap.get(rule.documentTypeKey);
+    if (!documentTypeId) {
+      throw new Error(`Unknown document type key: ${rule.documentTypeKey}`);
+    }
+    const payerId = rule.payerName ? (payerMap.get(rule.payerName) ?? null) : null;
+    const procedureId = rule.procedureName ? (procedureMap.get(rule.procedureName) ?? null) : null;
+
+    await db.checklistRule.create({
+      data: {
+        payerId,
+        procedureId,
+        stage: rule.stage,
+        documentTypeId,
+        requirement: rule.requirement,
+        needsFreshCopy: rule.needsFreshCopy ?? false,
+        note: rule.note ?? null,
+        updatedById: meeraId,
+      },
+    });
+  }
+  console.log(`✓ Seeded ${SEED_CHECKLIST_RULES.length} checklist rules.`);
+
+  console.log("Database seeded successfully.");
 }
 
 main()
