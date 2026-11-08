@@ -26,11 +26,18 @@ export function NavLink({ item }: { item: NavItem }) {
         <span
           className={cn(
             "rounded-full px-2 py-0.5 text-xs font-semibold",
-            isActive ? "text-primary bg-white" : "bg-primary text-primary-foreground",
+            item.hasDot
+              ? "bg-destructive text-white"
+              : isActive
+                ? "text-primary bg-white"
+                : "bg-primary text-primary-foreground",
           )}
         >
           {item.badge}
         </span>
+      )}
+      {item.hasDot && (!item.badge || item.badge <= 0) && (
+        <span className="bg-destructive size-2 rounded-full" />
       )}
     </Link>
   );

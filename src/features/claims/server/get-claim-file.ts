@@ -41,6 +41,8 @@ export const getClaimFile = cache(
             id: true,
             deadlineAt: true,
             receivedAt: true,
+            summary: true,
+            subject: true,
             asks: {
               select: {
                 id: true,
@@ -132,6 +134,13 @@ export const getClaimFile = cache(
       payer: claim.payer,
       procedure: claim.procedure,
       assignee: claim.assignee,
+      openQueries: claim.queries.map((q) => ({
+        id: q.id,
+        deadlineAt: q.deadlineAt,
+        receivedAt: q.receivedAt,
+        summary: q.summary,
+        subject: q.subject,
+      })),
       insight,
       availableEvents: legalEvents,
       readyLine,

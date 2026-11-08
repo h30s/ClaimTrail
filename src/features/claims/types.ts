@@ -80,6 +80,13 @@ export type ClaimFileDto = {
     id: string;
     name: string;
   } | null;
+  openQueries?: Array<{
+    id: string;
+    deadlineAt: Date;
+    receivedAt: Date;
+    summary: string | null;
+    subject: string;
+  }>;
   insight: ClaimInsight;
   availableEvents: ClaimEventName[];
   readyLine: string;

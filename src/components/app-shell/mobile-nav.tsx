@@ -11,9 +11,28 @@ import { NAV_ITEMS } from "./nav-items";
 import { NavLink } from "./nav-link";
 import { UserMenu } from "./user-menu";
 
-export function MobileNav({ user, className }: { user: SessionUser; className?: string }) {
+export function MobileNav({
+  user,
+  inboxBadge,
+  className,
+}: {
+  user: SessionUser;
+  inboxBadge?: { dueToday: number; overdue: number; hasOverdue: boolean };
+  className?: string;
+}) {
   const [open, setOpen] = useState(false);
-  const visibleItems = NAV_ITEMS.filter((item) => !item.permission || can(user.role, item.permission));
+  const visibleItems = NAV_ITEMS.filter((item) => !item.permission || can(user.role, item.permission)).map(
+    (item) => {
+      if (item.href === "/inbox" && inboxBadge) {
+        return {
+          ...item,
+          badge: inboxBadge.dueToday,
+          hasDot: inboxBadge.hasOverdue,
+        };
+      }
+      return item;
+    },
+  );
 
   return (
     <header

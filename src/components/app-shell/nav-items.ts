@@ -16,6 +16,7 @@ export type NavItem = {
   icon: LucideIcon;
   permission?: Permission;
   badge?: number;
+  hasDot?: boolean;
 };
 
 export const NAV_ITEMS: readonly NavItem[] = [

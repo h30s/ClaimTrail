@@ -5,8 +5,27 @@ import { NAV_ITEMS } from "./nav-items";
 import { NavLink } from "./nav-link";
 import { UserMenu } from "./user-menu";
 
-export function Sidebar({ user, className }: { user: SessionUser; className?: string }) {
-  const visibleItems = NAV_ITEMS.filter((item) => !item.permission || can(user.role, item.permission));
+export function Sidebar({
+  user,
+  inboxBadge,
+  className,
+}: {
+  user: SessionUser;
+  inboxBadge?: { dueToday: number; overdue: number; hasOverdue: boolean };
+  className?: string;
+}) {
+  const visibleItems = NAV_ITEMS.filter((item) => !item.permission || can(user.role, item.permission)).map(
+    (item) => {
+      if (item.href === "/inbox" && inboxBadge) {
+        return {
+          ...item,
+          badge: inboxBadge.dueToday,
+          hasDot: inboxBadge.hasOverdue,
+        };
+      }
+      return item;
+    },
+  );
 
   return (
     <aside

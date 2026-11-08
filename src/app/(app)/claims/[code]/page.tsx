@@ -5,6 +5,7 @@ import { TimelineCard } from "@/features/claims/components/timeline-card";
 import { getClaimFile } from "@/features/claims/server/queries";
 import { listClaimDocuments } from "@/features/documents/server/queries";
 import { ChecklistBoard } from "@/features/documents/components/checklist-board";
+import { OpenQueryCard } from "@/features/tpa-queries/components/open-query-card";
 
 export default async function ClaimDocumentsPage(props: { params: Promise<{ code: string }> }) {
   const { code } = await props.params;
@@ -33,6 +34,19 @@ export default async function ClaimDocumentsPage(props: { params: Promise<{ code
       </div>
 
       <div className="space-y-4">
+        {file.openQueries?.map((q) => (
+          <OpenQueryCard
+            key={q.id}
+            query={{
+              id: q.id,
+              deadlineAt: q.deadlineAt,
+              receivedAt: q.receivedAt,
+              summary: q.summary,
+              subject: q.subject,
+              payerName: file.payer.name,
+            }}
+          />
+        ))}
         <TimelineCard code={code} events={file.recentEvents} />
       </div>
     </div>

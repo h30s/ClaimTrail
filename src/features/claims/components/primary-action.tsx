@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { useAction } from "@/hooks/use-action";
 import { can } from "@/lib/auth/permissions";
+import { cn } from "@/lib/utils";
 import type { SessionUser } from "@/lib/auth/session";
 import type { ClaimFileDto } from "../types";
 import { startStage } from "../server/actions";
@@ -52,11 +54,13 @@ export function PrimaryAction({ file, user }: { file: ClaimFileDto; user: Sessio
   }
 
   if (status === "QUERY") {
+    const targetQuery = file.openQueries?.[0];
+    const href = targetQuery ? `/inbox/${targetQuery.id}` : "/inbox";
     return (
-      <Button size="sm" render={<a href="#queries" />} className="gap-1.5">
+      <Link href={href} className={cn(buttonVariants({ size: "sm" }), "gap-1.5")}>
         <span>Reply to query</span>
         <ArrowRight className="size-3.5" />
-      </Button>
+      </Link>
     );
   }
 
