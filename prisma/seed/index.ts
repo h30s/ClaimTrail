@@ -9,6 +9,7 @@ import { SEED_DOCUMENT_TYPES } from "./data/document-types";
 import { SEED_CHECKLIST_RULES } from "./data/checklist-rules";
 import { seedClaims } from "./seed-claims";
 import { seedDocuments } from "./seed-documents";
+import { seedQueries } from "./seed-queries";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
@@ -146,6 +147,9 @@ async function main() {
 
   // 7. Documents
   await seedDocuments(db, { userMap, docTypeMap });
+
+  // 8. Queries
+  await seedQueries(db, { userMap, payerMap, docTypeMap });
 
   console.log("Database seeded successfully.");
 }
