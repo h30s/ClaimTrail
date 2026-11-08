@@ -1,6 +1,7 @@
 import "server-only";
 import { type PDFDocument, type PDFPage, rgb, StandardFonts } from "pdf-lib";
 import type { PacketContents } from "./packet-contents";
+import { sanitizePdfText } from "./sanitize-pdf-text";
 
 export type ResolvedPacketDoc = {
   label: string;
@@ -166,31 +167,25 @@ export async function drawCover(
     const rightCol = contents.confirmedFields.slice(mid);
     const startY = y;
 
-    for (let i = 0; i < leftCol.length; i++) {
-      const field = leftCol[i]!;
-      page.drawText(`${field.label}: `, {
-        x: 50,
-        y: startY - i * 14,
-        size: 8,
-        font: boldFont,
-        color: darkGray,
-      });
-      const labelWidth = boldFont.widthOfTextAtSize(`${field.label}: `, 8);
-      page.drawText(field.value, { x: 50 + labelWidth, y: startY - i * 14, size: 8, font, color: darkGray });
-    }
+    const renderCol = (cols: typeof leftCol, colX: number) => {
+      for (let i = 0; i < cols.length; i++) {
+        const field = cols[i]!;
+        const cleanLabel = sanitizePdfText(field.label);
+        const cleanVal = sanitizePdfText(field.value);
+        page.drawText(`${cleanLabel}: `, {
+          x: colX,
+          y: startY - i * 14,
+          size: 8,
+          font: boldFont,
+          color: darkGray,
+        });
+        const labelWidth = boldFont.widthOfTextAtSize(`${cleanLabel}: `, 8);
+        page.drawText(cleanVal, { x: colX + labelWidth, y: startY - i * 14, size: 8, font, color: darkGray });
+      }
+    };
 
-    for (let i = 0; i < rightCol.length; i++) {
-      const field = rightCol[i]!;
-      page.drawText(`${field.label}: `, {
-        x: 310,
-        y: startY - i * 14,
-        size: 8,
-        font: boldFont,
-        color: darkGray,
-      });
-      const labelWidth = boldFont.widthOfTextAtSize(`${field.label}: `, 8);
-      page.drawText(field.value, { x: 310 + labelWidth, y: startY - i * 14, size: 8, font, color: darkGray });
-    }
+    renderCol(leftCol, 50);
+    renderCol(rightCol, 310);
 
     y = startY - Math.max(leftCol.length, rightCol.length) * 14;
   }
