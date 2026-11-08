@@ -1,9 +1,9 @@
 import type { PrismaClient } from "../../src/generated/prisma/client";
 import { storage } from "../../src/lib/storage";
 import { newStorageKey } from "../../src/lib/storage/storage-key";
-import { PREAUTH_FIELDS } from "../../src/features/preauth/domain/preauth-fields";
 import { renderSamplePdf } from "./render-sample-pdf";
 import { SEED_DOCUMENT_SPECS } from "./data/documents";
+import { seedPreauthFields } from "./seed-preauth";
 
 export async function seedDocuments(
   db: PrismaClient,
@@ -21,6 +21,8 @@ export async function seedDocuments(
   } catch (err) {
     console.warn("Storage prefix cleanup skipped:", err);
   }
+
+  const docsByFileName = new Map<string, { id: string; claimId: string; uploadedAt: Date }>();
 
   for (const spec of SEED_DOCUMENT_SPECS) {
     const claim = await db.claim.findFirst({
@@ -67,48 +69,14 @@ export async function seedDocuments(
       },
     });
 
-    // If CLM-3381: confirm all 12 fields (as per brief: "All 12 fields confirmed")
-    if (claim.code === "CLM-3381" && spec.typeKey === "PREAUTH_FORM") {
-      const fieldValues: Record<string, string> = {
-        patientName: "Rajendra Pawar",
-        age: "54",
-        gender: "MALE",
-        policyNumber: claim.policyNumber,
-        memberId: "MED-2024-88491",
-        admissionDate: dateStr,
-        treatingDoctor: claim.treatingDoctor,
-        chiefComplaints: "Severe right upper quadrant pain radiating to back x 3 days",
-        provisionalDiagnosis: "Cholelithiasis with acute cholecystitis",
-        proposedTreatment: "Laparoscopic Cholecystectomy",
-        expectedStayDays: "2",
-        estimatedCost: "85000",
-      };
-
-      for (const f of PREAUTH_FIELDS) {
-        const val = fieldValues[f.key] ?? "N/A";
-        await db.fieldSuggestion.create({
-          data: {
-            claimId: claim.id,
-            documentId: doc.id,
-            fieldKey: f.key,
-            value: val,
-            sourceSnippet: `${f.label}: ${val}`,
-            confidence: 0.96,
-          },
-        });
-
-        await db.claimField.create({
-          data: {
-            claimId: claim.id,
-            fieldKey: f.key,
-            value: val,
-            confirmedById: arjunId,
-            confirmedAt: uploadedAt,
-          },
-        });
-      }
-    }
+    docsByFileName.set(spec.fileName, {
+      id: doc.id,
+      claimId: claim.id,
+      uploadedAt,
+    });
   }
+
+  await seedPreauthFields(db, { arjunId, docsByFileName });
 
   console.log(`✓ Seeded sample PDFs and documents for claims.`);
 }
