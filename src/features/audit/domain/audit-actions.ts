@@ -5,8 +5,10 @@ export type AuditAction =
   | "CLAIM_ASSIGNED"
   | "DOCUMENT_UPLOADED"
   | "DOCUMENT_SORTED"
+  | "DOCUMENT_ANALYSED"
   | "DOCUMENT_MOVED"
   | "DOCUMENT_REMOVED"
+  | "IDENTITY_CONFIRMED"
   | "FIELD_CONFIRMED"
   | "FIELD_DISMISSED"
   | "QUERY_LINKED"
@@ -25,8 +27,10 @@ export const AUDIT_ACTION_LABEL: Record<AuditAction, string> = {
   CLAIM_ASSIGNED: "Assigned claim",
   DOCUMENT_UPLOADED: "Uploaded document",
   DOCUMENT_SORTED: "Sorted document",
+  DOCUMENT_ANALYSED: "Analysed document with AI",
   DOCUMENT_MOVED: "Moved document slot",
   DOCUMENT_REMOVED: "Removed document",
+  IDENTITY_CONFIRMED: "Confirmed patient identity",
   FIELD_CONFIRMED: "Confirmed field",
   FIELD_DISMISSED: "Dismissed field",
   QUERY_LINKED: "Linked query",
