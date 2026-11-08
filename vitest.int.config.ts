@@ -8,6 +8,7 @@ export default defineConfig({
     environment: "node",
     include: ["src/**/*.int.test.ts"],
     fileParallelism: false,
+    setupFiles: ["./test/int-setup.ts"],
   },
   resolve: {
     alias: {
