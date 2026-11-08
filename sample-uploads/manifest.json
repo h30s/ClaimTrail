@@ -1,0 +1,53 @@
+[
+  {
+    "file": "usg-abdomen-rajendra-pawar.pdf",
+    "expectedType": "ULTRASOUND_REPORT",
+    "expectedPatient": "Rajendra Pawar",
+    "expectedFields": {
+      "provisionalDiagnosis": "Cholelithiasis with acute cholecystitis"
+    }
+  },
+  {
+    "file": "cbc-latest-imran-shaikh.pdf",
+    "expectedType": "CBC_REPORT",
+    "expectedPatient": "Imran Shaikh",
+    "expectedFields": {}
+  },
+  {
+    "file": "final-bill-ganesh-thakare.pdf",
+    "expectedType": "FINAL_BILL",
+    "expectedPatient": "Ganesh Thakare",
+    "expectedFields": {
+      "estimatedCost": "38000"
+    }
+  },
+  {
+    "file": "discharge-summary-lata-sonawane.pdf",
+    "expectedType": "DISCHARGE_SUMMARY",
+    "expectedPatient": "Lata Sonawane",
+    "expectedFields": {}
+  },
+  {
+    "file": "xray-chest-anil-jadhav.pdf",
+    "expectedType": "XRAY_REPORT",
+    "expectedPatient": "Anil Jadhav",
+    "expectedFields": {}
+  },
+  {
+    "file": "preauth-form-kavita-nikam.pdf",
+    "expectedType": "PREAUTH_FORM",
+    "expectedPatient": "Kavita Nikam",
+    "expectedFields": {
+      "patientName": "Kavita Nikam",
+      "age": "34",
+      "gender": "FEMALE",
+      "estimatedCost": "70000"
+    }
+  },
+  {
+    "file": "restaurant-food-bill.pdf",
+    "expectedType": "UNKNOWN",
+    "expectedPatient": "Walk-in Guest",
+    "expectedFields": {}
+  }
+]

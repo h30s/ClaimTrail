@@ -18,7 +18,7 @@ export function documentAnalysisSchema(typeKeys: [string, ...string[]]) {
       )
       .max(2)
       .default([]),
-    reason: z.string().max(300),
+    reason: z.string().max(500).nullable().default(null),
     isLegible: z.boolean(),
     patientName: z.string().nullable(),
     documentDate: z.string().nullable(),

@@ -19,7 +19,7 @@ ${fieldList}
 
 Instructions:
 1. Identify the primary document type from the allowed list. If uncertain or it does not match, return "UNKNOWN".
-2. Assign a confidence score between 0.0 and 1.0. If confidence is below 0.8, provide a concise explanation in "reason".
+2. Assign a confidence score between 0.0 and 1.0. If confidence is below 0.8, provide a concise explanation in "reason" (otherwise it can be null or a brief phrase).
 3. Provide up to 2 alternatives with confidence if the document could plausibly belong to another category.
 4. Assess if the document is legible. Set isLegible to false if text is too blurry, cropped, or degraded to read reliably.
 5. Extract the patient's full name as written on the document into "patientName", or null if not found.

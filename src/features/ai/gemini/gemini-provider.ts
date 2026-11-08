@@ -24,6 +24,24 @@ function toKeyTuple(types: DocumentTypeHint[]): [string, ...string[]] {
   return [keys[0]!, ...keys.slice(1)];
 }
 
+async function generateWithRetry<T>(call: () => Promise<T>): Promise<T> {
+  const maxRetries = 2;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await call();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      const isRateLimit = msg.includes("429") || msg.includes("RESOURCE_EXHAUSTED");
+      if (isRateLimit && attempt < maxRetries) {
+        await new Promise((r) => setTimeout(r, 15000 * (attempt + 1)));
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw new Error("Retry limit exceeded");
+}
+
 export const geminiProvider: AiProvider = {
   async analyseDocument(input: AnalyseDocumentInput): Promise<AiResult<DocumentAnalysis>> {
     const start = Date.now();
@@ -43,25 +61,27 @@ export const geminiProvider: AiProvider = {
 
     try {
       const base64Data = Buffer.from(input.bytes).toString("base64");
-      const response = await geminiClient.models.generateContent({
-        model,
-        contents: [
-          {
-            inlineData: {
-              mimeType: input.mimeType,
-              data: base64Data,
+      const response = await generateWithRetry(() =>
+        geminiClient.models.generateContent({
+          model,
+          contents: [
+            {
+              inlineData: {
+                mimeType: input.mimeType,
+                data: base64Data,
+              },
             },
+            {
+              text: `File name: ${input.fileName}\nAnalyze this document and output JSON adhering to the specified schema.`,
+            },
+          ],
+          config: {
+            systemInstruction: system,
+            responseMimeType: "application/json",
+            temperature: 0.1,
           },
-          {
-            text: `File name: ${input.fileName}\nAnalyze this document and output JSON adhering to the specified schema.`,
-          },
-        ],
-        config: {
-          systemInstruction: system,
-          responseMimeType: "application/json",
-          temperature: 0.1,
-        },
-      });
+        }),
+      );
 
       const usage = {
         prompt: response.usageMetadata?.promptTokenCount,
@@ -123,19 +143,21 @@ export const geminiProvider: AiProvider = {
     });
 
     try {
-      const response = await geminiClient.models.generateContent({
-        model,
-        contents: [
-          {
-            text: `Subject: ${input.subject}\nReceived: ${input.receivedAt.toISOString()}\n\nBody:\n${input.body}`,
+      const response = await generateWithRetry(() =>
+        geminiClient.models.generateContent({
+          model,
+          contents: [
+            {
+              text: `Subject: ${input.subject}\nReceived: ${input.receivedAt.toISOString()}\n\nBody:\n${input.body}`,
+            },
+          ],
+          config: {
+            systemInstruction: system,
+            responseMimeType: "application/json",
+            temperature: 0.1,
           },
-        ],
-        config: {
-          systemInstruction: system,
-          responseMimeType: "application/json",
-          temperature: 0.1,
-        },
-      });
+        }),
+      );
 
       const usage = {
         prompt: response.usageMetadata?.promptTokenCount,
