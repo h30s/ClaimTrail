@@ -28,7 +28,7 @@ export function AdmissionSection({
         <div className="space-y-1">
           <Label className="text-xs">Procedure</Label>
           <Select
-            value={procedureId}
+            value={procedureId || null}
             onValueChange={(val) => {
               if (val) setValue("procedureId", val);
             }}
@@ -104,7 +104,7 @@ export function InsuranceSection({
         <div className="space-y-1">
           <Label className="text-xs">Payer / TPA</Label>
           <Select
-            value={payerId}
+            value={payerId || null}
             onValueChange={(val) => {
               if (val) setValue("payerId", val);
             }}
@@ -144,7 +144,7 @@ export function InsuranceSection({
           <div className="space-y-1">
             <Label className="text-xs">Assign Executive</Label>
             <Select
-              value={assigneeId}
+              value={assigneeId || null}
               onValueChange={(val) => {
                 if (val) setValue("assigneeId", val);
               }}

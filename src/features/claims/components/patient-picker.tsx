@@ -107,7 +107,7 @@ export function PatientPicker({
           <div className="space-y-1">
             <Label className="text-xs">Gender</Label>
             <Select
-              value={gender}
+              value={gender || null}
               onValueChange={(val) => {
                 if (val) setValue("patientGender", val as "MALE" | "FEMALE" | "OTHER");
               }}

@@ -53,6 +53,9 @@ export function NewClaimForm({
       admittedAt: today,
       estimatedAmount: 85000,
       patientGender: "MALE",
+      procedureId: "",
+      payerId: "",
+      assigneeId: "",
     },
   });
 

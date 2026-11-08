@@ -28,7 +28,7 @@ export function FieldInput({
 
   if (kind === "gender") {
     return (
-      <Select value={value} onValueChange={(val) => onChange(val ?? "")} disabled={disabled}>
+      <Select value={value || null} onValueChange={(val) => onChange(val ?? "")} disabled={disabled}>
         <SelectTrigger className="h-8 text-xs">
           <SelectValue placeholder="Select gender" />
         </SelectTrigger>
