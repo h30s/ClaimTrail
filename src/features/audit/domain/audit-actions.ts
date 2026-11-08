@@ -12,6 +12,7 @@ export type AuditAction =
   | "IDENTITY_CONFIRMED"
   | "FIELD_CONFIRMED"
   | "FIELD_DISMISSED"
+  | "QUERY_INGESTED"
   | "QUERY_LINKED"
   | "QUERY_REPLIED"
   | "CLAIM_SUBMITTED"
@@ -36,6 +37,7 @@ export const AUDIT_ACTION_LABEL: Record<AuditAction, string> = {
   IDENTITY_CONFIRMED: "Confirmed patient identity",
   FIELD_CONFIRMED: "Confirmed field",
   FIELD_DISMISSED: "Dismissed field",
+  QUERY_INGESTED: "Ingested query email",
   QUERY_LINKED: "Linked query",
   QUERY_REPLIED: "Recorded reply",
   CLAIM_SUBMITTED: "Submitted claim",

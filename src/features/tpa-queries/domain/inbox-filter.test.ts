@@ -7,31 +7,31 @@ describe("matchesFilter", () => {
 
   const openDueToday: InboxQueryItem = {
     status: "OPEN",
-    dueAt: new Date("2026-11-08T10:00:00.000Z"),
+    deadlineAt: new Date("2026-11-08T10:00:00.000Z"),
     claimId: "claim-1",
   };
 
   const openOverdue: InboxQueryItem = {
     status: "OPEN",
-    dueAt: new Date("2026-11-08T05:00:00.000Z"),
+    deadlineAt: new Date("2026-11-08T05:00:00.000Z"),
     claimId: "claim-2",
   };
 
   const openTomorrow: InboxQueryItem = {
     status: "OPEN",
-    dueAt: new Date("2026-11-09T08:00:00.000Z"),
+    deadlineAt: new Date("2026-11-09T08:00:00.000Z"),
     claimId: "claim-3",
   };
 
   const openUnmatched: InboxQueryItem = {
     status: "OPEN",
-    dueAt: new Date("2026-11-08T12:00:00.000Z"),
+    deadlineAt: new Date("2026-11-08T12:00:00.000Z"),
     claimId: null,
   };
 
   const answeredQuery: InboxQueryItem = {
     status: "ANSWERED",
-    dueAt: new Date("2026-11-08T04:00:00.000Z"),
+    deadlineAt: new Date("2026-11-08T04:00:00.000Z"),
     repliedAt: new Date("2026-11-08T03:30:00.000Z"),
     claimId: "claim-4",
   };
@@ -70,12 +70,12 @@ describe("compareForInbox", () => {
   it("sorts open queries before answered queries", () => {
     const open: InboxQueryItem = {
       status: "OPEN",
-      dueAt: new Date("2026-11-09T10:00:00.000Z"),
+      deadlineAt: new Date("2026-11-09T10:00:00.000Z"),
       claimId: "c1",
     };
     const answered: InboxQueryItem = {
       status: "ANSWERED",
-      dueAt: new Date("2026-11-07T10:00:00.000Z"),
+      deadlineAt: new Date("2026-11-07T10:00:00.000Z"),
       repliedAt: new Date("2026-11-07T09:00:00.000Z"),
       claimId: "c2",
     };
@@ -84,15 +84,15 @@ describe("compareForInbox", () => {
     expect(compareForInbox(answered, open)).toBeGreaterThan(0);
   });
 
-  it("sorts open queries by soonest dueAt first (overdue items appear before future items)", () => {
+  it("sorts open queries by soonest deadlineAt first (overdue items appear before future items)", () => {
     const overdue: InboxQueryItem = {
       status: "OPEN",
-      dueAt: new Date("2026-11-08T05:00:00.000Z"),
+      deadlineAt: new Date("2026-11-08T05:00:00.000Z"),
       claimId: "c1",
     };
     const future: InboxQueryItem = {
       status: "OPEN",
-      dueAt: new Date("2026-11-08T11:00:00.000Z"),
+      deadlineAt: new Date("2026-11-08T11:00:00.000Z"),
       claimId: "c2",
     };
 
@@ -103,13 +103,13 @@ describe("compareForInbox", () => {
   it("sorts answered queries by repliedAt descending", () => {
     const newerReply: InboxQueryItem = {
       status: "ANSWERED",
-      dueAt: new Date("2026-11-08T10:00:00.000Z"),
+      deadlineAt: new Date("2026-11-08T10:00:00.000Z"),
       repliedAt: new Date("2026-11-08T09:30:00.000Z"),
       claimId: "c1",
     };
     const olderReply: InboxQueryItem = {
       status: "ANSWERED",
-      dueAt: new Date("2026-11-08T10:00:00.000Z"),
+      deadlineAt: new Date("2026-11-08T10:00:00.000Z"),
       repliedAt: new Date("2026-11-08T08:00:00.000Z"),
       claimId: "c2",
     };

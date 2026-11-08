@@ -5,7 +5,7 @@ export type InboxFilter = "open" | "due-today" | "overdue" | "unmatched" | "answ
 
 export type InboxQueryItem = {
   status: "OPEN" | "ANSWERED";
-  dueAt: Date;
+  deadlineAt: Date;
   repliedAt?: Date | null;
   claimId: string | null;
 };
@@ -15,9 +15,9 @@ export function matchesFilter(filter: InboxFilter, q: InboxQueryItem, now: Date)
     case "open":
       return q.status === "OPEN";
     case "due-today":
-      return q.status === "OPEN" && istDateKey(q.dueAt) === istDateKey(now);
+      return q.status === "OPEN" && istDateKey(q.deadlineAt) === istDateKey(now);
     case "overdue":
-      return q.status === "OPEN" && q.dueAt < now;
+      return q.status === "OPEN" && q.deadlineAt < now;
     case "unmatched":
       return q.status === "OPEN" && q.claimId === null;
     case "answered":
@@ -36,5 +36,5 @@ export function compareForInbox(a: InboxQueryItem, b: InboxQueryItem): number {
     return bReplied - aReplied;
   }
 
-  return a.dueAt.getTime() - b.dueAt.getTime();
+  return a.deadlineAt.getTime() - b.deadlineAt.getTime();
 }
