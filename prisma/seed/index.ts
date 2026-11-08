@@ -10,6 +10,7 @@ import { SEED_CHECKLIST_RULES } from "./data/checklist-rules";
 import { seedClaims } from "./seed-claims";
 import { seedDocuments } from "./seed-documents";
 import { seedQueries } from "./seed-queries";
+import { seedSettledClaims } from "./seed-settled-claims";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
@@ -150,6 +151,9 @@ async function main() {
 
   // 8. Queries
   await seedQueries(db, { userMap, payerMap, docTypeMap });
+
+  // 9. Historical Settled Claims & Analytics
+  await seedSettledClaims(db, { userMap, payerMap, procedureMap, docTypeMap });
 
   console.log("Database seeded successfully.");
 }
