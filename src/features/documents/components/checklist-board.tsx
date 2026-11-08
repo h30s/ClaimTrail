@@ -140,7 +140,11 @@ export function ChecklistBoard({
           onPreview={handleOpenPreview}
           onMoveOptimistic={(targetKey) => {
             const first = trayDocs[0];
-            if (first) setOptimisticDocs({ docId: first.id, targetKey });
+            if (first) {
+              startTransition(() => {
+                setOptimisticDocs({ docId: first.id, targetKey });
+              });
+            }
           }}
         />
 

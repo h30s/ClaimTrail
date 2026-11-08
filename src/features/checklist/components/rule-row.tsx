@@ -1,6 +1,6 @@
 "use client";
 
-import { useOptimistic } from "react";
+import { startTransition, useOptimistic } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAction } from "@/hooks/use-action";
 import { SCOPE_LABEL } from "../domain/labels";
@@ -36,27 +36,31 @@ export function RuleRow({
       requirement: newReq,
       needsFreshCopy: newReq === "INHERIT" || newReq === "NOT_NEEDED" ? false : optimistic.needsFreshCopy,
     };
-    setOptimistic(updated);
-    run({
-      payerId: scope.payerId,
-      procedureId: scope.procedureId,
-      stage: scope.stage,
-      documentTypeId: row.documentType.id,
-      requirement: updated.requirement,
-      needsFreshCopy: updated.needsFreshCopy,
+    startTransition(() => {
+      setOptimistic(updated);
+      run({
+        payerId: scope.payerId,
+        procedureId: scope.procedureId,
+        stage: scope.stage,
+        documentTypeId: row.documentType.id,
+        requirement: updated.requirement,
+        needsFreshCopy: updated.needsFreshCopy,
+      });
     });
   };
 
   const handleFreshCopyChange = (checked: boolean) => {
     const updated = { ...optimistic, needsFreshCopy: checked };
-    setOptimistic(updated);
-    run({
-      payerId: scope.payerId,
-      procedureId: scope.procedureId,
-      stage: scope.stage,
-      documentTypeId: row.documentType.id,
-      requirement: updated.requirement,
-      needsFreshCopy: checked,
+    startTransition(() => {
+      setOptimistic(updated);
+      run({
+        payerId: scope.payerId,
+        procedureId: scope.procedureId,
+        stage: scope.stage,
+        documentTypeId: row.documentType.id,
+        requirement: updated.requirement,
+        needsFreshCopy: checked,
+      });
     });
   };
 
