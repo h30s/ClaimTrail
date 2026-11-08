@@ -13,4 +13,24 @@ export type {
   QueryStatus,
   DeadlineSource,
   DeductionReason,
+  AiTask,
+  AiRunStatus,
+} from "@/generated/prisma/enums";
+
+export {
+  Role as RoleEnum,
+  PayerKind as PayerKindEnum,
+  Gender as GenderEnum,
+  Stage as StageEnum,
+  ClaimStatus as ClaimStatusEnum,
+  Requirement as RequirementEnum,
+  DocumentStatus as DocumentStatusEnum,
+  SortedBy as SortedByEnum,
+  IdentityCheck as IdentityCheckEnum,
+  ClaimEventType as ClaimEventTypeEnum,
+  QueryStatus as QueryStatusEnum,
+  DeadlineSource as DeadlineSourceEnum,
+  DeductionReason as DeductionReasonEnum,
+  AiTask as AiTaskEnum,
+  AiRunStatus as AiRunStatusEnum,
 } from "@/generated/prisma/enums";
