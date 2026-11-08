@@ -7,6 +7,7 @@ import { SEED_PAYERS } from "./data/payers";
 import { SEED_PROCEDURES } from "./data/procedures";
 import { SEED_DOCUMENT_TYPES } from "./data/document-types";
 import { SEED_CHECKLIST_RULES } from "./data/checklist-rules";
+import { seedClaims } from "./seed-claims";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
@@ -20,7 +21,7 @@ const db = new PrismaClient({
 const DEMO_PASSWORD = process.env.DEMO_PASSWORD || "ClaimTrail2026!";
 
 async function main() {
-  console.log("Seeding catalog, rules, and demo users...");
+  console.log("Seeding catalog, rules, claims, and demo users...");
 
   // Delete in reverse dependency order (wipe)
   await db.account.deleteMany();
@@ -48,9 +49,11 @@ async function main() {
   // 1. Users
   const hashedPassword = await hashPassword(DEMO_PASSWORD);
   let meeraId = "";
+  const userMap = new Map<string, string>();
   for (const u of SEED_USERS) {
     const id = crypto.randomUUID();
     if (u.role === "DESK_HEAD") meeraId = id;
+    userMap.set(u.email, id);
     await db.user.create({
       data: {
         id,
@@ -136,6 +139,9 @@ async function main() {
     });
   }
   console.log(`✓ Seeded ${SEED_CHECKLIST_RULES.length} checklist rules.`);
+
+  // 6. Claims
+  await seedClaims(db, { userMap, payerMap, procedureMap });
 
   console.log("Database seeded successfully.");
 }
