@@ -72,3 +72,9 @@ export type AssignClaimInput = z.infer<typeof AssignClaimSchema>;
 export const SearchPatientsSchema = z.object({
   q: z.string().min(2, "Enter at least 2 characters to search"),
 });
+
+export const SubmitClaimSchema = z.object({
+  claimCode: z.string().min(1),
+  overrideReason: z.string().trim().max(300).optional(),
+});
+export type SubmitClaimInput = z.infer<typeof SubmitClaimSchema>;

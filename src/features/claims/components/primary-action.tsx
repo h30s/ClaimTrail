@@ -4,12 +4,16 @@ import { useState } from "react";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAction } from "@/hooks/use-action";
+import { can } from "@/lib/auth/permissions";
+import type { SessionUser } from "@/lib/auth/session";
 import type { ClaimFileDto } from "../types";
 import { startStage } from "../server/actions";
+import { PrepareSubmissionDialog } from "./prepare-submission-dialog";
 import { RecordDecisionDialog } from "./record-decision-dialog";
 
-export function PrimaryAction({ file }: { file: ClaimFileDto }) {
+export function PrimaryAction({ file, user }: { file: ClaimFileDto; user: SessionUser }) {
   const [decisionOpen, setDecisionOpen] = useState(false);
+  const [prepareOpen, setPrepareOpen] = useState(false);
   const { status, stage } = file.claim;
 
   const { run: runStartStage, pending: stagePending } = useAction(startStage, {
@@ -59,15 +63,25 @@ export function PrimaryAction({ file }: { file: ClaimFileDto }) {
   if (status === "DRAFT") {
     const isReady = file.insight.gaps.isReady;
     return (
-      <Button
-        size="sm"
-        variant={isReady ? "default" : "outline"}
-        className="gap-1.5"
-        render={<a href="#submission" />}
-      >
-        {isReady && <CheckCircle2 className="text-success size-3.5" />}
-        <span>Prepare submission</span>
-      </Button>
+      <>
+        <Button
+          size="sm"
+          variant={isReady ? "default" : "outline"}
+          className="gap-1.5"
+          onClick={() => setPrepareOpen(true)}
+        >
+          {isReady && <CheckCircle2 className="text-success size-3.5" />}
+          <span>Prepare submission</span>
+        </Button>
+        <PrepareSubmissionDialog
+          claimCode={file.claim.code}
+          payerName={file.payer.name}
+          stage={stage}
+          open={prepareOpen}
+          onOpenChange={setPrepareOpen}
+          isHead={can(user.role, "submission:override")}
+        />
+      </>
     );
   }
 
