@@ -34,6 +34,10 @@ export type ClaimInsightInput = {
   confirmedFieldKeys: string[];
   labelFor: (documentTypeId: string) => string;
   now: Date;
+  doctorApproval?: {
+    status: "PENDING" | "APPROVED" | "CHANGES_REQUESTED";
+    comment?: string | null;
+  } | null;
 };
 
 export type ClaimInsight = {
@@ -79,6 +83,7 @@ export function buildClaimInsight(input: ClaimInsightInput): ClaimInsight {
     unconfirmedRequiredFields,
     labelFor,
     now,
+    doctorApproval: input.doctorApproval,
   });
 
   const urgency = urgencyScore(attention);

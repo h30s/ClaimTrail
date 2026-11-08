@@ -13,6 +13,7 @@ export type {
   QueryStatus,
   DeadlineSource,
   DeductionReason,
+  ApprovalStatus,
   AiTask,
   AiRunStatus,
 } from "@/generated/prisma/enums";
@@ -31,6 +32,7 @@ export {
   QueryStatus as QueryStatusEnum,
   DeadlineSource as DeadlineSourceEnum,
   DeductionReason as DeductionReasonEnum,
+  ApprovalStatus as ApprovalStatusEnum,
   AiTask as AiTaskEnum,
   AiRunStatus as AiRunStatusEnum,
 } from "@/generated/prisma/enums";

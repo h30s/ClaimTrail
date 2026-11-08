@@ -9,7 +9,9 @@ export type AttentionKind =
   | "UNSORTED"
   | "FIELDS_TO_CONFIRM"
   | "PAYER_CLOCK"
-  | "QUERY_OPEN";
+  | "QUERY_OPEN"
+  | "DOCTOR_SIGNOFF_PENDING"
+  | "CHANGES_REQUESTED";
 
 export type Severity = "critical" | "warning" | "info";
 
@@ -25,12 +27,14 @@ const WEIGHT: Record<AttentionKind, number> = {
   QUERY_OVERDUE: 1000,
   IDENTITY_CHECK: 400,
   QUERY_DUE_SOON: 300,
+  CHANGES_REQUESTED: 350,
   HOSPITAL_CLOCK: 250,
   MISSING_DOC: 100,
   STALE_DOC: 100,
   UNSORTED: 60,
   PAYER_CLOCK: 50,
   FIELDS_TO_CONFIRM: 40,
+  DOCTOR_SIGNOFF_PENDING: 30,
   QUERY_OPEN: 20,
 };
 

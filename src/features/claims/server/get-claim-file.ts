@@ -62,6 +62,11 @@ export const getClaimFile = cache(
             },
           },
         },
+        doctorApprovals: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: { id: true, status: true, comment: true, doctorName: true, expiresAt: true },
+        },
       },
     });
 
@@ -103,6 +108,7 @@ export const getClaimFile = cache(
       confirmedFieldKeys: confirmedKeys,
       labelFor,
       now,
+      doctorApproval: claim.doctorApprovals[0] ?? null,
     });
 
     const legalEvents = availableEvents({
@@ -146,6 +152,7 @@ export const getClaimFile = cache(
       procedure: claim.procedure,
       assignee: claim.assignee,
       deductions: claim.deductions,
+      doctorApproval: claim.doctorApprovals[0] ?? null,
       openQueries: claim.queries.map((q) => ({
         id: q.id,
         deadlineAt: q.deadlineAt,

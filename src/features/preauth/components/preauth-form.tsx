@@ -1,6 +1,7 @@
 import { Download } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { RequestDoctorSignoffDialog } from "@/features/doctor-signoff/components/request-doctor-signoff-dialog";
 import { PREAUTH_FIELDS } from "../domain/preauth-fields";
 import type { FieldView } from "../domain/field-states";
 import { FieldRow } from "./field-row";
@@ -35,14 +36,17 @@ export function PreauthForm({
           </div>
         </div>
 
-        <a
-          href={`/api/claims/${claimCode}/packet`}
-          download
-          className={cn(buttonVariants({ variant: "outline", size: "sm" }), "h-8 text-xs")}
-        >
-          <Download className="mr-1.5 size-3.5" />
-          Download packet
-        </a>
+        <div className="flex flex-wrap items-center gap-2">
+          <RequestDoctorSignoffDialog claimCode={claimCode} />
+          <a
+            href={`/api/claims/${claimCode}/packet`}
+            download
+            className={cn(buttonVariants({ variant: "outline", size: "sm" }), "h-8 text-xs")}
+          >
+            <Download className="mr-1.5 size-3.5" />
+            Download packet
+          </a>
+        </div>
       </div>
 
       <div className="space-y-6">

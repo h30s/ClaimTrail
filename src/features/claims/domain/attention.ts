@@ -15,6 +15,10 @@ export type AttentionInput = {
   unconfirmedRequiredFields: number;
   labelFor: (documentTypeId: string) => string;
   now: Date;
+  doctorApproval?: {
+    status: "PENDING" | "APPROVED" | "CHANGES_REQUESTED";
+    comment?: string | null;
+  } | null;
 };
 
 const SEVERITY_ORDER: Record<Severity, number> = {
@@ -23,16 +27,9 @@ const SEVERITY_ORDER: Record<Severity, number> = {
   info: 2,
 };
 
-export function collectAttention(input: {
-  claim: { stage: Stage; status: ClaimStatus };
-  gaps: GapReport;
-  clocks: ClockReport;
-  openQueries: Array<{ id: string; dueAt: Date }>;
-  unconfirmedRequiredFields: number;
-  labelFor: (documentTypeId: string) => string;
-  now: Date;
-}): AttentionItem[] {
-  const { claim, gaps, clocks, openQueries, unconfirmedRequiredFields, labelFor, now } = input;
+export function collectAttention(input: AttentionInput): AttentionItem[] {
+  const { claim, gaps, clocks, openQueries, unconfirmedRequiredFields, labelFor, now, doctorApproval } =
+    input;
   const items: AttentionItem[] = [];
 
   // 1, 3, 10: Query countdowns
@@ -142,6 +139,27 @@ export function collectAttention(input: {
       severity: "info",
       label: `${unconfirmedRequiredFields} pre-auth fields to confirm`,
       count: unconfirmedRequiredFields,
+      anchor: "/preauth",
+    });
+  }
+
+  // 8b. Doctor sign-off
+  if (doctorApproval?.status === "CHANGES_REQUESTED") {
+    items.push({
+      kind: "CHANGES_REQUESTED",
+      severity: "warning",
+      label: doctorApproval.comment
+        ? `Doctor requested changes: "${doctorApproval.comment}"`
+        : "Doctor requested changes to clinical notes",
+      count: 1,
+      anchor: "/preauth",
+    });
+  } else if (doctorApproval?.status === "PENDING") {
+    items.push({
+      kind: "DOCTOR_SIGNOFF_PENDING",
+      severity: "info",
+      label: "Doctor sign-off pending on WhatsApp link",
+      count: 1,
       anchor: "/preauth",
     });
   }
