@@ -7,6 +7,7 @@ import {
   AssignClaimSchema,
   CreateClaimSchema,
   RecordDecisionSchema,
+  RecordSettlementSchema,
   SearchPatientsSchema,
   StartStageSchema,
   SubmitClaimSchema,
@@ -14,6 +15,7 @@ import {
 import { assignClaim as assignClaimOp } from "./assign-claim";
 import { createClaim as createClaimOp } from "./create-claim";
 import { recordDecision as recordDecisionOp } from "./record-decision";
+import { recordSettlement as recordSettlementOp } from "./record-settlement";
 import { searchPatients as searchPatientsOp } from "./search-patients";
 import { startStage as startStageOp } from "./start-stage";
 import { submitClaim as submitClaimOp } from "./submit-claim";
@@ -80,5 +82,16 @@ export const getSubmissionCheckAction = defineAction(
   { schema: z.object({ claimCode: z.string().min(1) }), permission: "claim:work" },
   async (input, { user }) => {
     return await getSubmissionCheck(user, input.claimCode);
+  },
+);
+
+export const recordSettlement = defineAction(
+  { schema: RecordSettlementSchema, permission: "claim:work" },
+  async (input, { user }) => {
+    const res = await recordSettlementOp(user, input);
+    revalidatePath("/claims");
+    revalidatePath(`/claims/${input.claimCode}`);
+    revalidatePath(`/claims/${input.claimCode}`, "layout");
+    return res;
   },
 );

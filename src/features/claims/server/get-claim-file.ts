@@ -34,6 +34,15 @@ export const getClaimFile = cache(
             uploadedAt: true,
           },
         },
+        deductions: {
+          select: {
+            id: true,
+            reason: true,
+            amount: true,
+            note: true,
+          },
+          orderBy: { amount: "desc" },
+        },
         fields: { select: { fieldKey: true, confirmedAt: true } },
         queries: {
           where: { status: "OPEN" },
@@ -124,6 +133,8 @@ export const getClaimFile = cache(
         admittedAt: claim.admittedAt,
         estimatedAmount: claim.estimatedAmount,
         approvedAmount: claim.approvedAmount,
+        billedAmount: claim.billedAmount,
+        settledAmount: claim.settledAmount,
         stage: claim.stage,
         status: claim.status,
         stageStartedAt: claim.stageStartedAt,
@@ -134,6 +145,7 @@ export const getClaimFile = cache(
       payer: claim.payer,
       procedure: claim.procedure,
       assignee: claim.assignee,
+      deductions: claim.deductions,
       openQueries: claim.queries.map((q) => ({
         id: q.id,
         deadlineAt: q.deadlineAt,

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listDocumentTypes } from "@/features/catalog/server/queries";
 import { TimelineCard } from "@/features/claims/components/timeline-card";
+import { SettlementCard } from "@/features/claims/components/settlement-card";
 import { getClaimFile } from "@/features/claims/server/queries";
 import { listClaimDocuments } from "@/features/documents/server/queries";
 import { ChecklistBoard } from "@/features/documents/components/checklist-board";
@@ -34,6 +35,7 @@ export default async function ClaimDocumentsPage(props: { params: Promise<{ code
       </div>
 
       <div className="space-y-4">
+        {file.claim.status === "SETTLED" && <SettlementCard file={file} />}
         {file.openQueries?.map((q) => (
           <OpenQueryCard
             key={q.id}

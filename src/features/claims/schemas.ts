@@ -78,3 +78,41 @@ export const SubmitClaimSchema = z.object({
   overrideReason: z.string().trim().max(300).optional(),
 });
 export type SubmitClaimInput = z.infer<typeof SubmitClaimSchema>;
+
+export const DeductionItemSchema = z.object({
+  reason: z.enum([
+    "MISSING_DOCUMENT",
+    "NON_PAYABLE_ITEM",
+    "ROOM_RENT_LIMIT",
+    "TARIFF_DIFFERENCE",
+    "CO_PAYMENT",
+    "OTHER",
+  ]),
+  amount: z.number().int().positive("Amount must be greater than 0"),
+  note: z.string().trim().max(200, "Note must be under 200 characters").optional(),
+});
+export type DeductionItem = z.infer<typeof DeductionItemSchema>;
+
+export const RecordSettlementSchema = z
+  .object({
+    claimCode: ClaimCodeSchema,
+    billedAmount: z.number().int().positive("Billed amount must be greater than 0"),
+    settledAmount: z.number().int().min(0, "Settled amount cannot be negative"),
+    deductions: z.array(DeductionItemSchema),
+  })
+  .refine((data) => data.settledAmount <= data.billedAmount, {
+    message: "Settled amount cannot exceed billed amount",
+    path: ["settledAmount"],
+  })
+  .superRefine((data, ctx) => {
+    const diff = data.billedAmount - data.settledAmount;
+    const sum = data.deductions.reduce((acc, d) => acc + (d.amount || 0), 0);
+    if (diff !== sum) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Deductions must add up to ₹${diff.toLocaleString("en-IN")} (billed − settled).`,
+        path: ["deductions"],
+      });
+    }
+  });
+export type RecordSettlementInput = z.infer<typeof RecordSettlementSchema>;

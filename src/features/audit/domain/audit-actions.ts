@@ -17,7 +17,10 @@ export type AuditAction =
   | "QUERY_REPLIED"
   | "CLAIM_SUBMITTED"
   | "PACKET_DOWNLOADED"
+  | "CLAIM_SETTLED"
   | "DEDUCTION_RECORDED"
+  | "DOCTOR_LINK_CREATED"
+  | "DOCTOR_DECIDED"
   | "RULE_UPDATED"
   | "RULE_REMOVED"
   | "PAYER_UPDATED"
@@ -42,7 +45,10 @@ export const AUDIT_ACTION_LABEL: Record<AuditAction, string> = {
   QUERY_REPLIED: "Recorded reply",
   CLAIM_SUBMITTED: "Submitted claim",
   PACKET_DOWNLOADED: "Downloaded submission packet",
+  CLAIM_SETTLED: "Settled claim",
   DEDUCTION_RECORDED: "Recorded deduction",
+  DOCTOR_LINK_CREATED: "Created doctor approval link",
+  DOCTOR_DECIDED: "Doctor decided on notes",
   RULE_UPDATED: "Updated checklist rule",
   RULE_REMOVED: "Removed checklist rule",
   PAYER_UPDATED: "Updated payer settings",

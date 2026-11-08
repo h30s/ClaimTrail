@@ -1,4 +1,4 @@
-import type { ClaimEventType, ClaimStatus, Gender, PayerKind, Stage } from "@/lib/enums";
+import type { ClaimEventType, ClaimStatus, DeductionReason, Gender, PayerKind, Stage } from "@/lib/enums";
 import type { ClaimInsight } from "./domain/claim-insight";
 import type { ClockReport } from "./domain/clocks";
 import type { ClaimEventName } from "./domain/status-machine";
@@ -52,6 +52,8 @@ export type ClaimFileDto = {
     admittedAt: Date;
     estimatedAmount: number;
     approvedAmount: number | null;
+    billedAmount: number | null;
+    settledAmount: number | null;
     stage: Stage;
     status: ClaimStatus;
     stageStartedAt: Date;
@@ -80,6 +82,12 @@ export type ClaimFileDto = {
     id: string;
     name: string;
   } | null;
+  deductions?: Array<{
+    id: string;
+    reason: DeductionReason;
+    amount: number;
+    note: string | null;
+  }>;
   openQueries?: Array<{
     id: string;
     deadlineAt: Date;

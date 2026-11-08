@@ -12,10 +12,12 @@ import type { ClaimFileDto } from "../types";
 import { startStage } from "../server/actions";
 import { PrepareSubmissionDialog } from "./prepare-submission-dialog";
 import { RecordDecisionDialog } from "./record-decision-dialog";
+import { RecordSettlementDialog } from "./record-settlement-dialog";
 
 export function PrimaryAction({ file, user }: { file: ClaimFileDto; user: SessionUser }) {
   const [decisionOpen, setDecisionOpen] = useState(false);
   const [prepareOpen, setPrepareOpen] = useState(false);
+  const [settlementOpen, setSettlementOpen] = useState(false);
   const { status, stage } = file.claim;
 
   const { run: runStartStage, pending: stagePending } = useAction(startStage, {
@@ -50,6 +52,24 @@ export function PrimaryAction({ file, user }: { file: ClaimFileDto; user: Sessio
         <span>{stagePending ? "Starting…" : "Start enhancement"}</span>
         <ArrowRight className="size-3.5" />
       </Button>
+    );
+  }
+
+  if (status === "APPROVED" && stage === "DISCHARGE") {
+    return (
+      <>
+        <Button size="sm" onClick={() => setSettlementOpen(true)} className="gap-1.5">
+          <span>Record settlement</span>
+          <ArrowRight className="size-3.5" />
+        </Button>
+        <RecordSettlementDialog
+          claimCode={file.claim.code}
+          defaultBilled={file.claim.billedAmount ?? file.claim.approvedAmount ?? file.claim.estimatedAmount}
+          defaultSettled={file.claim.settledAmount ?? file.claim.approvedAmount}
+          open={settlementOpen}
+          onOpenChange={setSettlementOpen}
+        />
+      </>
     );
   }
 

@@ -1,5 +1,14 @@
-import type { ClaimEventType, ClaimStatus, Stage } from "@/lib/enums";
+import type { ClaimEventType, ClaimStatus, DeductionReason, Stage } from "@/lib/enums";
 import type { MilestoneKey } from "./milestones";
+
+export const DEDUCTION_REASON_LABEL: Record<DeductionReason, string> = {
+  MISSING_DOCUMENT: "Missing document",
+  NON_PAYABLE_ITEM: "Non-payable item",
+  ROOM_RENT_LIMIT: "Room-rent limit",
+  TARIFF_DIFFERENCE: "Tariff difference",
+  CO_PAYMENT: "Co-payment",
+  OTHER: "Other",
+};
 
 export const STAGE_LABEL: Record<Stage, string> = {
   PRE_AUTH: "Pre-auth",
