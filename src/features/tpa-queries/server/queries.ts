@@ -5,67 +5,69 @@ import { db } from "@/lib/db";
 import { compareForInbox, matchesFilter, type InboxFilter } from "../domain/inbox-filter";
 import { queryScopeWhere } from "./query-scope";
 
-export const listInbox = cache(async (user: SessionUser, filter: InboxFilter = "open", now: Date) => {
-  const allQueries = await db.tpaQuery.findMany({
-    where: queryScopeWhere(user),
-    include: {
-      payer: { select: { id: true, name: true, kind: true } },
-      claim: {
-        select: {
-          id: true,
-          code: true,
-          patient: { select: { name: true } },
-          assignee: { select: { id: true, name: true } },
-        },
-      },
-      asks: {
-        select: {
-          id: true,
-          text: true,
-          documentType: { select: { label: true } },
-        },
-        orderBy: { position: "asc" },
-      },
-    },
-  });
-
-  const suggestedIds = allQueries.map((q) => q.suggestedClaimId).filter((id): id is string => Boolean(id));
-
-  const suggestedClaims =
-    suggestedIds.length > 0
-      ? await db.claim.findMany({
-          where: { id: { in: suggestedIds } },
+export const listInbox = cache(
+  async (user: SessionUser, filter: InboxFilter = "open", now: Date = new Date()) => {
+    const allQueries = await db.tpaQuery.findMany({
+      where: queryScopeWhere(user),
+      include: {
+        payer: { select: { id: true, name: true, kind: true } },
+        claim: {
           select: {
             id: true,
             code: true,
             patient: { select: { name: true } },
+            assignee: { select: { id: true, name: true } },
           },
-        })
-      : [];
+        },
+        asks: {
+          select: {
+            id: true,
+            text: true,
+            documentType: { select: { label: true } },
+          },
+          orderBy: { position: "asc" },
+        },
+      },
+    });
 
-  const suggestedMap = new Map(suggestedClaims.map((c) => [c.id, c]));
+    const suggestedIds = allQueries.map((q) => q.suggestedClaimId).filter((id): id is string => Boolean(id));
 
-  const counts = {
-    open: allQueries.filter((q) => matchesFilter("open", q, now)).length,
-    dueToday: allQueries.filter((q) => matchesFilter("due-today", q, now)).length,
-    overdue: allQueries.filter((q) => matchesFilter("overdue", q, now)).length,
-    unmatched: allQueries.filter((q) => matchesFilter("unmatched", q, now)).length,
-    answered: allQueries.filter((q) => matchesFilter("answered", q, now)).length,
-  };
+    const suggestedClaims =
+      suggestedIds.length > 0
+        ? await db.claim.findMany({
+            where: { id: { in: suggestedIds } },
+            select: {
+              id: true,
+              code: true,
+              patient: { select: { name: true } },
+            },
+          })
+        : [];
 
-  const filtered = allQueries.filter((q) => matchesFilter(filter, q, now));
-  const sorted = [...filtered].sort(compareForInbox);
+    const suggestedMap = new Map(suggestedClaims.map((c) => [c.id, c]));
 
-  const rows = sorted.map((q) => ({
-    ...q,
-    suggestedClaim: q.suggestedClaimId ? (suggestedMap.get(q.suggestedClaimId) ?? null) : null,
-  }));
+    const counts = {
+      open: allQueries.filter((q) => matchesFilter("open", q, now)).length,
+      dueToday: allQueries.filter((q) => matchesFilter("due-today", q, now)).length,
+      overdue: allQueries.filter((q) => matchesFilter("overdue", q, now)).length,
+      unmatched: allQueries.filter((q) => matchesFilter("unmatched", q, now)).length,
+      answered: allQueries.filter((q) => matchesFilter("answered", q, now)).length,
+    };
 
-  return {
-    rows,
-    counts,
-  };
-});
+    const filtered = allQueries.filter((q) => matchesFilter(filter, q, now));
+    const sorted = [...filtered].sort(compareForInbox);
+
+    const rows = sorted.map((q) => ({
+      ...q,
+      suggestedClaim: q.suggestedClaimId ? (suggestedMap.get(q.suggestedClaimId) ?? null) : null,
+    }));
+
+    return {
+      rows,
+      counts,
+    };
+  },
+);
 
 export const getQueryDetail = cache(async (user: SessionUser, id: string) => {
   const query = await db.tpaQuery.findFirst({

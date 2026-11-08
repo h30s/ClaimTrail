@@ -23,11 +23,14 @@ export async function createTestUser(role: Role = "DESK_EXECUTIVE"): Promise<Ses
   };
 }
 
-export async function createTestClaim(assigneeId: string | null): Promise<{
+export async function createTestClaim(
+  assigneeId: string | null,
+  overrideCode?: string,
+): Promise<{
   id: string;
   code: string;
 }> {
-  const code = `CLM-TEST-${crypto.randomUUID().slice(0, 4)}`;
+  const code = overrideCode ?? `CLM-${Math.floor(10000 + Math.random() * 89999)}`;
   const patient = await db.patient.create({
     data: {
       name: "Test Patient",

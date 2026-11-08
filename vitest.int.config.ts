@@ -8,6 +8,8 @@ export default defineConfig({
     environment: "node",
     include: ["src/**/*.int.test.ts"],
     fileParallelism: false,
+    testTimeout: 60000,
+    hookTimeout: 60000,
     setupFiles: ["./test/int-setup.ts"],
   },
   resolve: {

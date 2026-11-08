@@ -56,10 +56,11 @@ export function querySummarySchema(typeKeys: [string, ...string[]]) {
     patientName: z.string().nullable(),
     deadline: z
       .object({
-        iso: z.string().nullable(),
-        sourceSnippet: z.string().nullable(),
+        iso: z.string().nullable().default(null),
+        sourceSnippet: z.string().nullable().default(null),
       })
-      .default({ iso: null, sourceSnippet: null }),
+      .nullable()
+      .default(null),
   });
 }
 

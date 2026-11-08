@@ -24,34 +24,50 @@ function toKeyTuple(types: DocumentTypeHint[]): [string, ...string[]] {
   return [keys[0]!, ...keys.slice(1)];
 }
 
-async function generateWithRetry<T>(call: () => Promise<T>): Promise<T> {
-  const maxRetries = 2;
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+const FALLBACK_MODELS = [
+  env.GEMINI_MODEL,
+  "gemini-3.5-flash-lite",
+  "gemini-3.1-flash-lite",
+  "gemini-3.5-flash",
+  "gemini-3.8-flash",
+];
+
+async function generateWithFallback<T>(
+  call: (model: string) => Promise<T>,
+): Promise<{ result: T; usedModel: string }> {
+  const models = Array.from(new Set(FALLBACK_MODELS));
+  let lastErr: unknown;
+
+  for (const model of models) {
     try {
-      return await call();
+      const res = await call(model);
+      return { result: res, usedModel: model };
     } catch (err: unknown) {
+      lastErr = err;
       const msg = err instanceof Error ? err.message : String(err);
-      const isRateLimit = msg.includes("429") || msg.includes("RESOURCE_EXHAUSTED");
-      if (isRateLimit && attempt < maxRetries) {
-        await new Promise((r) => setTimeout(r, 15000 * (attempt + 1)));
+      const isQuotaOrNotFound =
+        msg.includes("429") ||
+        msg.includes("RESOURCE_EXHAUSTED") ||
+        msg.includes("404") ||
+        msg.includes("NOT_FOUND");
+      if (isQuotaOrNotFound) {
         continue;
       }
       throw err;
     }
   }
-  throw new Error("Retry limit exceeded");
+  throw lastErr ?? new Error("All Gemini models exhausted");
 }
 
 export const geminiProvider: AiProvider = {
   async analyseDocument(input: AnalyseDocumentInput): Promise<AiResult<DocumentAnalysis>> {
     const start = Date.now();
     const promptVersion = DOCUMENT_PROMPT_VERSION;
-    const model = env.GEMINI_MODEL;
     const keys = toKeyTuple(input.documentTypes);
     const schema = documentAnalysisSchema(keys);
     const system = documentAnalysisSystemPrompt(input.documentTypes);
 
-    const meta = (usage?: { prompt?: number; output?: number }): AiMeta => ({
+    const makeMeta = (model: string, usage?: { prompt?: number; output?: number }): AiMeta => ({
       model,
       promptVersion,
       latencyMs: Date.now() - start,
@@ -61,7 +77,7 @@ export const geminiProvider: AiProvider = {
 
     try {
       const base64Data = Buffer.from(input.bytes).toString("base64");
-      const response = await generateWithRetry(() =>
+      const { result: response, usedModel } = await generateWithFallback((model) =>
         geminiClient.models.generateContent({
           model,
           contents: [
@@ -94,7 +110,7 @@ export const geminiProvider: AiProvider = {
           ok: false,
           reason: "REFUSED",
           message: "Document was declined by safety filters.",
-          meta: meta(usage),
+          meta: makeMeta(usedModel, usage),
         };
       }
 
@@ -104,7 +120,7 @@ export const geminiProvider: AiProvider = {
           ok: false,
           reason: "INVALID_OUTPUT",
           message: "Empty response from Gemini.",
-          meta: meta(usage),
+          meta: makeMeta(usedModel, usage),
         };
       }
 
@@ -115,26 +131,25 @@ export const geminiProvider: AiProvider = {
           ok: false,
           reason: "INVALID_OUTPUT",
           message: checked.error.message,
-          meta: meta(usage),
+          meta: makeMeta(usedModel, usage),
         };
       }
 
-      return { ok: true, data: checked.data, meta: meta(usage) };
+      return { ok: true, data: checked.data, meta: makeMeta(usedModel, usage) };
     } catch (error) {
       const message = error instanceof Error ? error.message : "AI request failed";
-      return { ok: false, reason: "ERROR", message, meta: meta() };
+      return { ok: false, reason: "ERROR", message, meta: makeMeta(env.GEMINI_MODEL) };
     }
   },
 
   async summariseQuery(input: SummariseQueryInput): Promise<AiResult<QuerySummary>> {
     const start = Date.now();
     const promptVersion = QUERY_PROMPT_VERSION;
-    const model = env.GEMINI_MODEL;
     const keys = toKeyTuple(input.documentTypes);
     const schema = querySummarySchema(keys);
     const system = querySummarySystemPrompt(input.documentTypes);
 
-    const meta = (usage?: { prompt?: number; output?: number }): AiMeta => ({
+    const makeMeta = (model: string, usage?: { prompt?: number; output?: number }): AiMeta => ({
       model,
       promptVersion,
       latencyMs: Date.now() - start,
@@ -143,7 +158,7 @@ export const geminiProvider: AiProvider = {
     });
 
     try {
-      const response = await generateWithRetry(() =>
+      const { result: response, usedModel } = await generateWithFallback((model) =>
         geminiClient.models.generateContent({
           model,
           contents: [
@@ -170,7 +185,7 @@ export const geminiProvider: AiProvider = {
           ok: false,
           reason: "REFUSED",
           message: "Query email was declined by safety filters.",
-          meta: meta(usage),
+          meta: makeMeta(usedModel, usage),
         };
       }
 
@@ -180,7 +195,7 @@ export const geminiProvider: AiProvider = {
           ok: false,
           reason: "INVALID_OUTPUT",
           message: "Empty response from Gemini.",
-          meta: meta(usage),
+          meta: makeMeta(usedModel, usage),
         };
       }
 
@@ -191,14 +206,14 @@ export const geminiProvider: AiProvider = {
           ok: false,
           reason: "INVALID_OUTPUT",
           message: checked.error.message,
-          meta: meta(usage),
+          meta: makeMeta(usedModel, usage),
         };
       }
 
-      return { ok: true, data: checked.data, meta: meta(usage) };
+      return { ok: true, data: checked.data, meta: makeMeta(usedModel, usage) };
     } catch (error) {
       const message = error instanceof Error ? error.message : "AI query request failed";
-      return { ok: false, reason: "ERROR", message, meta: meta() };
+      return { ok: false, reason: "ERROR", message, meta: makeMeta(env.GEMINI_MODEL) };
     }
   },
 };
