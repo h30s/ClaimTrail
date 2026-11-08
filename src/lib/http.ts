@@ -1,5 +1,6 @@
 // Helpers for our few route handlers (uploads, file streaming, packets).
 import "server-only";
+import { ZodError } from "zod";
 import { getSessionUser, type SessionUser } from "@/lib/auth/session";
 import { AppError, ForbiddenError, UnauthorizedError } from "@/lib/errors";
 
@@ -19,6 +20,9 @@ export function assertSameOrigin(request: Request): void {
 }
 
 export function errorResponse(error: unknown): Response {
+  if (error instanceof ZodError) {
+    return Response.json({ error: error.issues[0]?.message ?? "Invalid input." }, { status: 400 });
+  }
   if (error instanceof AppError) {
     return Response.json({ error: error.message }, { status: error.status });
   }

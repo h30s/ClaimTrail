@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export const ClaimCodeSchema = z.string().regex(/^CLM-\d+$/, "Claim code must be formatted like CLM-1234");
+
 export const WorklistParamsSchema = z.object({
   tab: z.enum(["action", "open", "sent", "settled"]).default("action"),
   q: z.string().optional(),
