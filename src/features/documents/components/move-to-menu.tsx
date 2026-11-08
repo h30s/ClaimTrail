@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -65,27 +66,29 @@ export function MoveToMenu({
         }
       />
       <DropdownMenuContent align="end" className="max-h-72 w-56 overflow-y-auto">
-        <DropdownMenuLabel className="text-xs">Select checklist slot</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {currentTypeKey !== null && (
-          <>
-            <DropdownMenuItem className="text-muted-foreground text-xs" onClick={() => handleMove(null)}>
-              <Inbox className="mr-2 size-3.5" />
-              Needs sorting (Tray)
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="text-xs">Select checklist slot</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {currentTypeKey !== null && (
+            <>
+              <DropdownMenuItem className="text-muted-foreground text-xs" onClick={() => handleMove(null)}>
+                <Inbox className="mr-2 size-3.5" />
+                Needs sorting (Tray)
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
+          {documentTypes.map((dt) => (
+            <DropdownMenuItem
+              key={dt.key}
+              disabled={dt.key === currentTypeKey}
+              className="text-xs"
+              onClick={() => handleMove(dt.key)}
+            >
+              {dt.label}
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-          </>
-        )}
-        {documentTypes.map((dt) => (
-          <DropdownMenuItem
-            key={dt.key}
-            disabled={dt.key === currentTypeKey}
-            className="text-xs"
-            onClick={() => handleMove(dt.key)}
-          >
-            {dt.label}
-          </DropdownMenuItem>
-        ))}
+          ))}
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );
