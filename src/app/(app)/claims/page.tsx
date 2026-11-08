@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,12 @@ import { WorklistToolbar } from "@/features/claims/components/worklist-toolbar";
 import { WorklistParamsSchema } from "@/features/claims/schemas";
 import { listWorklist } from "@/features/claims/server/queries";
 import type { WorklistTab } from "@/features/claims/types";
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Claims",
+};
 
 export default async function ClaimsPage(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

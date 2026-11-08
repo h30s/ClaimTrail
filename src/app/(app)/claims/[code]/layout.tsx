@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { recordAudit } from "@/features/audit/server/record-audit";
 import { AttentionStrip } from "@/features/claims/components/attention-strip";
@@ -7,6 +8,13 @@ import { getClaimFile } from "@/features/claims/server/queries";
 import { can } from "@/lib/auth/permissions";
 import { requireUser } from "@/lib/auth/session";
 import { db } from "@/lib/db";
+
+export async function generateMetadata(props: { params: Promise<{ code: string }> }): Promise<Metadata> {
+  const { code } = await props.params;
+  return {
+    title: code,
+  };
+}
 
 export default async function ClaimLayout({
   children,

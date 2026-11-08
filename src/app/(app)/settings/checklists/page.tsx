@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { listPayers, listProcedures } from "@/features/catalog/server/queries";
 import { ChecklistPreview } from "@/features/checklist/components/checklist-preview";
 import { RuleTable } from "@/features/checklist/components/rule-table";
@@ -13,6 +14,12 @@ type SearchParams = Promise<{
   previewPayer?: string;
   previewProcedure?: string;
 }>;
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Checklist Rules",
+};
 
 export default async function ChecklistRulesPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;

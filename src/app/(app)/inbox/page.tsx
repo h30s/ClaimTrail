@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import { Inbox } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Query Inbox",
+};
 
 export default function InboxPage() {
   return (

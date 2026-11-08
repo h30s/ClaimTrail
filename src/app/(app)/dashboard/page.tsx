@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { requireUser } from "@/lib/auth/session";
 import { formatDuration } from "@/lib/format";
@@ -8,6 +9,10 @@ import { StatTile } from "@/features/dashboard/components/stat-tile";
 import { getDashboard } from "@/features/dashboard/server/queries";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+};
 
 export default async function DashboardPage(props: { searchParams: Promise<{ days?: string }> }) {
   const user = await requireUser();

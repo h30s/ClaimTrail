@@ -16,8 +16,14 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ClaimTrail",
-  description: "Cashless claims and TPA tracking workspace",
+  title: {
+    default: "ClaimTrail",
+    template: "%s · ClaimTrail",
+  },
+  description: "Cashless claims and TPA tracking workspace for hospital insurance desks",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

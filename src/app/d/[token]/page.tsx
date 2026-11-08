@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { FileText, ShieldAlert } from "lucide-react";
 import { formatInr } from "@/lib/format";
 import { db } from "@/lib/db";
@@ -5,6 +6,10 @@ import { hashDoctorToken } from "@/features/doctor-signoff/server/hash";
 import { DoctorDecisionForm } from "@/features/doctor-signoff/components/doctor-decision-form";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Doctor Sign-Off",
+};
 
 export default async function DoctorSignoffPage(props: { params: Promise<{ token: string }> }) {
   const { token } = await props.params;

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { AccessDenied } from "@/components/access-denied";
 import { AuditFilters } from "@/features/audit/components/audit-filters";
 import { AuditTable } from "@/features/audit/components/audit-table";
@@ -8,6 +9,10 @@ import { requireUser } from "@/lib/auth/session";
 import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Audit Log",
+};
 
 export default async function AuditPage(props: {
   searchParams: Promise<{

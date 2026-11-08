@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { PageHeader } from "@/components/page-header";
 import { can } from "@/lib/auth/permissions";
 import { requireUser } from "@/lib/auth/session";
 import { db } from "@/lib/db";
 import { listPayers, listProcedures } from "@/features/catalog/server/queries";
 import { NewClaimForm } from "@/features/claims/components/new-claim-form";
+
+export const metadata: Metadata = {
+  title: "New Claim",
+};
 
 export default async function NewClaimPage() {
   const user = await requireUser();

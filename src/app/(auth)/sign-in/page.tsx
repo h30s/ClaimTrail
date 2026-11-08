@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DemoAccounts } from "@/features/auth/components/demo-accounts";
@@ -6,6 +7,10 @@ import { getSessionUser } from "@/lib/auth/session";
 import { env } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Sign In",
+};
 
 export default async function SignInPage() {
   const user = await getSessionUser();

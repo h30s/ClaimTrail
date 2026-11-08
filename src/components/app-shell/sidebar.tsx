@@ -1,3 +1,4 @@
+import { KeyboardShortcutsDialog } from "@/components/keyboard-shortcuts-dialog";
 import { can } from "@/lib/auth/permissions";
 import type { SessionUser } from "@/lib/auth/session";
 import { cn } from "cn";
@@ -49,7 +50,10 @@ export function Sidebar({
         </nav>
       </div>
 
-      <UserMenu user={user} />
+      <div className="space-y-2">
+        <KeyboardShortcutsDialog />
+        <UserMenu user={user} />
+      </div>
     </aside>
   );
 }

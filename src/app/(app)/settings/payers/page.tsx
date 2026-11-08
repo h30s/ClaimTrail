@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import { PayerTable } from "@/features/catalog/components/payer-table";
 import { listPayers } from "@/features/catalog/server/queries";
+
+export const metadata: Metadata = {
+  title: "Payers",
+};
 
 export default async function PayersPage() {
   const payers = await listPayers();

@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import { DocumentTypeTable } from "@/features/catalog/components/document-type-table";
 import { listDocumentTypes } from "@/features/catalog/server/queries";
+
+export const metadata: Metadata = {
+  title: "Document Types",
+};
 
 export default async function DocumentTypesPage() {
   const docTypes = await listDocumentTypes();
