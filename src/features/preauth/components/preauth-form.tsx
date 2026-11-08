@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Download } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -36,13 +35,14 @@ export function PreauthForm({
           </div>
         </div>
 
-        <Link
+        <a
           href={`/api/claims/${claimCode}/packet`}
+          download
           className={cn(buttonVariants({ variant: "outline", size: "sm" }), "h-8 text-xs")}
         >
           <Download className="mr-1.5 size-3.5" />
           Download packet
-        </Link>
+        </a>
       </div>
 
       <div className="space-y-6">

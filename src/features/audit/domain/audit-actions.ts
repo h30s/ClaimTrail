@@ -15,6 +15,7 @@ export type AuditAction =
   | "QUERY_LINKED"
   | "QUERY_REPLIED"
   | "CLAIM_SUBMITTED"
+  | "PACKET_DOWNLOADED"
   | "DEDUCTION_RECORDED"
   | "RULE_UPDATED"
   | "RULE_REMOVED"
@@ -38,6 +39,7 @@ export const AUDIT_ACTION_LABEL: Record<AuditAction, string> = {
   QUERY_LINKED: "Linked query",
   QUERY_REPLIED: "Recorded reply",
   CLAIM_SUBMITTED: "Submitted claim",
+  PACKET_DOWNLOADED: "Downloaded submission packet",
   DEDUCTION_RECORDED: "Recorded deduction",
   RULE_UPDATED: "Updated checklist rule",
   RULE_REMOVED: "Removed checklist rule",
