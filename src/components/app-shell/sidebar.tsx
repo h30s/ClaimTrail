@@ -1,3 +1,5 @@
+"use client";
+
 import { KeyboardShortcutsDialog } from "@/components/keyboard-shortcuts-dialog";
 import { can } from "@/lib/auth/permissions";
 import type { SessionUser } from "@/lib/auth/session";

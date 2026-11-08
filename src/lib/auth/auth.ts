@@ -18,9 +18,9 @@ export const auth = betterAuth({
     },
   },
   rateLimit: {
-    enabled: true,
+    enabled: process.env.NODE_ENV === "production" && !process.env.PLAYWRIGHT_TEST,
     storage: "database",
-    customRules: { "/sign-in/email": { window: 60, max: 5 } },
+    customRules: { "/sign-in/email": { window: 60, max: 10 } },
   },
   plugins: [nextCookies()],
 });

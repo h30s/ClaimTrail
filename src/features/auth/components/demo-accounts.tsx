@@ -33,6 +33,7 @@ export function DemoAccounts({ demoPassword }: { demoPassword?: string }) {
       router.push("/claims");
       router.refresh();
     } else {
+      console.error("Demo sign-in failed:", result.error);
       setLoadingEmail(null);
     }
   };

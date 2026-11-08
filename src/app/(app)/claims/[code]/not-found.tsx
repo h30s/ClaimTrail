@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, FileQuestion } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function ClaimNotFound() {
   return (
@@ -14,10 +15,10 @@ export default function ClaimNotFound() {
           Claim not found, or it isn&apos;t assigned to you.
         </p>
       </div>
-      <Button variant="outline" size="sm" render={<Link href="/claims" />} className="gap-1.5">
+      <Link href="/claims" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-1.5")}>
         <ArrowLeft className="size-3.5" />
         <span>Back to claims</span>
-      </Button>
+      </Link>
     </div>
   );
 }

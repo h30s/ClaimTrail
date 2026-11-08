@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/page-header";
 import { can } from "@/lib/auth/permissions";
 import { requireUser } from "@/lib/auth/session";
@@ -58,10 +59,10 @@ export default async function ClaimsPage(props: {
         title="Claims"
         description="Active cashless requests, queries, and insurer decisions."
         actions={
-          <Button size="sm" render={<Link href="/claims/new" />}>
+          <Link href="/claims/new" className={cn(buttonVariants({ size: "sm" }), "gap-1.5")}>
             <Plus className="size-4" />
             <span>New claim</span>
-          </Button>
+          </Link>
         }
       />
 

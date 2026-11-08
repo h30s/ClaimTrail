@@ -16,9 +16,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useAction } from "@/hooks/use-action";
 import { cn } from "@/lib/utils";
-import { formatDateTime } from "@/lib/format";
 import { recordReplyAction } from "../server/actions";
 import type { QueryAskDto } from "./ask-list";
+import { RecordedReplyView } from "./recorded-reply-view";
 
 export type ClaimDocDto = {
   id: string;
@@ -56,7 +56,6 @@ export function ReplyComposer({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Pre-tick satisfied documents
   const satisfiedTypeIds = useMemo(
     () => new Set(asks.filter((a) => a.state === "SATISFIED" && a.documentType).map((a) => a.documentType)),
     [asks],
@@ -100,24 +99,12 @@ export function ReplyComposer({
 
   if (status === "ANSWERED") {
     return (
-      <div className="bg-surface space-y-3 rounded-lg border p-4 text-xs">
-        <div className="flex items-center justify-between border-b pb-2.5">
-          <h3 className="text-foreground text-sm font-semibold tracking-tight">Recorded reply</h3>
-          <span className="text-muted-foreground text-[11px]">
-            Sent {repliedAt ? formatDateTime(repliedAt) : ""} {repliedByName ? `by ${repliedByName}` : ""}
-          </span>
-        </div>
-
-        <div className="text-foreground bg-muted/30 rounded-md border p-3 font-sans text-xs leading-relaxed whitespace-pre-wrap">
-          {replyBody}
-        </div>
-
-        {replyDocumentIds.length > 0 && (
-          <div className="text-muted-foreground text-[11px]">
-            <span>Attached documents: {replyDocumentIds.length} document(s) included with reply</span>
-          </div>
-        )}
-      </div>
+      <RecordedReplyView
+        replyBody={replyBody}
+        repliedAt={repliedAt}
+        repliedByName={repliedByName}
+        replyDocumentIds={replyDocumentIds}
+      />
     );
   }
 
@@ -217,13 +204,7 @@ export function ReplyComposer({
             <Button
               size="sm"
               disabled={recording}
-              onClick={() =>
-                runRecord({
-                  queryId,
-                  replyBody: text.trim(),
-                  documentIds: selectedDocIds,
-                })
-              }
+              onClick={() => runRecord({ queryId, replyBody: text.trim(), documentIds: selectedDocIds })}
             >
               {recording ? "Recording…" : "Confirm sent"}
             </Button>
