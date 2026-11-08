@@ -50,9 +50,10 @@ export function MoveToMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
+        nativeButton={!children}
         render={
           children ? (
-            <span tabIndex={0} role="button" className="w-full">
+            <span tabIndex={0} role="button" className="w-full cursor-pointer">
               {children}
             </span>
           ) : (
