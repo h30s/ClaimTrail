@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { storage } from "@/lib/storage";
 import { hashDoctorToken } from "@/features/doctor-signoff/server/hash";
+import { renderDocumentPdf } from "@/features/documents/server/render-document-pdf";
 
 export const runtime = "nodejs";
 
@@ -28,13 +29,43 @@ export async function GET(
         claimId: approval.claimId,
         deletedAt: null,
       },
+      include: {
+        claim: {
+          select: {
+            code: true,
+            patient: { select: { name: true } },
+          },
+        },
+        documentType: { select: { label: true } },
+      },
     });
 
     if (!doc) {
       return new NextResponse("Document not found", { status: 404 });
     }
 
-    const bytes = await storage.get(doc.storageKey);
+    let bytes: Uint8Array;
+    try {
+      bytes = await storage.get(doc.storageKey);
+    } catch {
+      if (doc.mimeType === "application/pdf") {
+        bytes = await renderDocumentPdf({
+          fileName: doc.fileName,
+          claimCode: doc.claim.code,
+          patientName: doc.claim.patient.name,
+          documentTypeLabel: doc.documentType?.label,
+          uploadedAt: doc.uploadedAt,
+        });
+        try {
+          await storage.put(doc.storageKey, bytes, "application/pdf");
+        } catch {
+          // Non-blocking
+        }
+      } else {
+        return new NextResponse("Document file not found", { status: 404 });
+      }
+    }
+
     const safeName = doc.fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
 
     return new Response(Buffer.from(bytes), {

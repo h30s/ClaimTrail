@@ -1,7 +1,9 @@
 import type { PrismaClient } from "../../src/generated/prisma/client";
+import { storage } from "../../src/lib/storage";
 import { SEED_PAYERS } from "./data/payers";
 import { SEED_PROCEDURES } from "./data/procedures";
 import { generateSettledClaims } from "./data/settled-claims";
+import { renderSamplePdf } from "./render-sample-pdf";
 
 export async function seedSettledClaims(
   db: PrismaClient,
@@ -178,15 +180,30 @@ export async function seedSettledClaims(
       const docTypeId = ctx.docTypeMap.get(key)!;
       // ~91% AI sorted, ~9% moved by user
       const isMoved = (i + d) % 11 === 0;
+      const storageKey = `claims/${claim.code}/hist-${d + 1}.pdf`;
+
+      const bytes = await renderSamplePdf({
+        title: key.replace(/-/g, " ").toUpperCase(),
+        patientName: item.patientName,
+        date: admittedAt.toISOString().slice(0, 10),
+        lines: [
+          `Claim Reference: ${claim.code}`,
+          `Payer: ${item.payerName}`,
+          `Procedure: ${item.procedureName}`,
+          `Status: Settled claim archive record.`,
+        ],
+      });
+
+      await storage.put(storageKey, bytes, "application/pdf");
 
       await db.document.create({
         data: {
           claimId: claim.id,
           documentTypeId: docTypeId,
-          storageKey: `claims/${claim.code}/hist-${d + 1}.pdf`,
+          storageKey,
           fileName: `document-${d + 1}.pdf`,
           mimeType: "application/pdf",
-          sizeBytes: 24000,
+          sizeBytes: bytes.byteLength,
           pageCount: 1,
           status: "SORTED",
           sortedBy: isMoved ? "USER" : "AI",
