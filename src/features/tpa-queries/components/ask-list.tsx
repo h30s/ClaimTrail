@@ -46,7 +46,7 @@ export function AskList({
                     {isSatisfied ? (
                       <CheckCircle2 className="text-success size-4" />
                     ) : isMissing ? (
-                      <Circle className="size-4 text-amber-600 dark:text-amber-400" />
+                      <Circle className="size-4 text-amber-700" />
                     ) : (
                       <PenLine className="text-muted-foreground size-4" />
                     )}
@@ -65,14 +65,14 @@ export function AskList({
 
                 <div className="flex shrink-0 items-center gap-2 pl-6 sm:pl-0">
                   {isSatisfied && (
-                    <span className="inline-flex items-center rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
+                    <span className="inline-flex items-center rounded-md border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-900">
                       Uploaded ✓
                     </span>
                   )}
 
                   {isMissing && (
                     <div className="flex items-center gap-1.5">
-                      <span className="inline-flex items-center rounded-md border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
+                      <span className="inline-flex items-center rounded-md border border-amber-300 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-900">
                         Not uploaded
                       </span>
                       {claimCode && (

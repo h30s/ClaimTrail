@@ -42,13 +42,13 @@ export function LinkCard({
 
   if (suggestedClaim && !showSearch) {
     return (
-      <div className="space-y-2.5 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-900 dark:text-amber-100">
+      <div className="space-y-2.5 rounded-lg border border-amber-300 bg-amber-50 p-3.5 text-xs text-amber-950">
         <div className="flex items-start gap-2">
-          <AlertCircle className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400" />
+          <AlertCircle className="mt-0.5 size-4 shrink-0 text-amber-700" />
           <div className="space-y-0.5">
-            <div className="font-semibold">Suggested Claim Match</div>
-            <p className="text-[11px] text-amber-800 dark:text-amber-200">
-              Looks like <strong className="font-bold">{suggestedClaim.code}</strong> ·{" "}
+            <div className="font-semibold text-amber-950">Suggested Claim Match</div>
+            <p className="text-[11px] font-medium text-amber-900">
+              Looks like <strong className="font-bold text-amber-950">{suggestedClaim.code}</strong> ·{" "}
               {suggestedClaim.patient.name} (patient name match)
             </p>
           </div>

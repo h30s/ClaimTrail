@@ -51,8 +51,8 @@ export function DoctorDecisionForm({ token, doctorName }: { token: string; docto
 
   if (decided === "CHANGES_REQUESTED") {
     return (
-      <div className="border-warning/30 bg-warning-soft space-y-2 rounded-xl border p-6 text-center">
-        <MessageSquare className="text-warning mx-auto size-10" />
+      <div className="space-y-2 rounded-xl border border-amber-300 bg-amber-50 p-6 text-center">
+        <MessageSquare className="mx-auto size-10 text-amber-700" />
         <h3 className="text-foreground text-lg font-bold">Change Request Sent</h3>
         <p className="text-muted-foreground text-sm">
           Your feedback has been sent to the insurance desk to update the indoor papers before submission.

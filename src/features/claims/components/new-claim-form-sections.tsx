@@ -19,6 +19,8 @@ export function AdmissionSection({
   register: UseFormRegister<CreateClaimInput>;
   errors: FieldErrors<CreateClaimInput>;
 }) {
+  const procedureItems = procedures.map((proc) => ({ value: proc.id, label: proc.name }));
+
   return (
     <div className="border-border bg-surface space-y-3 rounded-lg border p-4">
       <h2 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
@@ -28,9 +30,10 @@ export function AdmissionSection({
         <div className="space-y-1">
           <Label className="text-xs">Procedure</Label>
           <Select
+            items={procedureItems}
             value={procedureId || null}
             onValueChange={(val) => {
-              if (val) setValue("procedureId", val);
+              if (val) setValue("procedureId", val, { shouldValidate: true });
             }}
           >
             <SelectTrigger className="h-8 text-xs">
@@ -95,6 +98,9 @@ export function InsuranceSection({
   register: UseFormRegister<CreateClaimInput>;
   errors: FieldErrors<CreateClaimInput>;
 }) {
+  const payerItems = payers.map((p) => ({ value: p.id, label: `${p.name} (${p.kind})` }));
+  const assigneeItems = assignees.map((e) => ({ value: e.id, label: e.name }));
+
   return (
     <div className="border-border bg-surface space-y-3 rounded-lg border p-4">
       <h2 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
@@ -104,9 +110,10 @@ export function InsuranceSection({
         <div className="space-y-1">
           <Label className="text-xs">Payer / TPA</Label>
           <Select
+            items={payerItems}
             value={payerId || null}
             onValueChange={(val) => {
-              if (val) setValue("payerId", val);
+              if (val) setValue("payerId", val, { shouldValidate: true });
             }}
           >
             <SelectTrigger className="h-8 text-xs">
@@ -144,9 +151,10 @@ export function InsuranceSection({
           <div className="space-y-1">
             <Label className="text-xs">Assign Executive</Label>
             <Select
+              items={assigneeItems}
               value={assigneeId || null}
               onValueChange={(val) => {
-                if (val) setValue("assigneeId", val);
+                if (val) setValue("assigneeId", val, { shouldValidate: true });
               }}
             >
               <SelectTrigger className="h-8 text-xs">

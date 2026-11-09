@@ -49,7 +49,7 @@ export function QueryListItem({
             {query.claim.code} · {query.claim.patient.name}
           </span>
         ) : query.suggestedClaim ? (
-          <span className="font-medium text-amber-700 dark:text-amber-300">
+          <span className="font-semibold text-amber-900">
             Suggested · {query.suggestedClaim.code} · {query.suggestedClaim.patient.name}
           </span>
         ) : (

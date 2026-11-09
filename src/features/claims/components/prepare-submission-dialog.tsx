@@ -106,7 +106,7 @@ function SubmissionDialogBody({
               <span className="font-medium">Checklist</span>
               <span
                 className={cn(
-                  satisfiedReq === reqSlots.length ? "text-success" : "text-amber-600 dark:text-amber-400",
+                  satisfiedReq === reqSlots.length ? "text-success" : "font-semibold text-amber-800",
                 )}
               >
                 {satisfiedReq} of {reqSlots.length} required
@@ -119,7 +119,7 @@ function SubmissionDialogBody({
                   className={cn(
                     check.fields.confirmed === check.fields.total
                       ? "text-success"
-                      : "text-amber-600 dark:text-amber-400",
+                      : "font-semibold text-amber-800",
                   )}
                 >
                   {check.fields.confirmed} of {check.fields.total} confirmed
@@ -129,12 +129,12 @@ function SubmissionDialogBody({
           </div>
 
           {hasGaps && (
-            <div className="space-y-1 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-amber-800 dark:text-amber-200">
-              <div className="flex items-center gap-1.5 font-medium">
-                <AlertCircle className="size-3.5 shrink-0" />
+            <div className="space-y-1.5 rounded-lg border border-amber-300 bg-amber-50 p-3 text-amber-950 shadow-xs">
+              <div className="flex items-center gap-1.5 font-semibold text-amber-950">
+                <AlertCircle className="size-4 shrink-0 text-amber-700" />
                 <span>Missing or blocking items ({check?.blockingItems.length})</span>
               </div>
-              <ul className="list-disc space-y-0.5 pl-4 text-[11px]">
+              <ul className="list-disc space-y-0.5 pl-4 text-xs font-medium text-amber-900">
                 {check?.blockingItems.map((item) => (
                   <li key={item}>{item}</li>
                 ))}

@@ -161,8 +161,8 @@ export function RecordSettlementDialog({
                 <strong className="text-foreground font-mono">₹{diff.toLocaleString("en-IN")}</strong>
               </span>
               <span
-                className={`font-medium ${
-                  remaining === 0 ? "text-success" : remaining > 0 ? "text-warning" : "text-destructive"
+                className={`font-semibold ${
+                  remaining === 0 ? "text-success" : remaining > 0 ? "text-amber-800" : "text-destructive"
                 }`}
               >
                 {remaining === 0

@@ -16,18 +16,18 @@ export function OpenQueryCard({
   };
 }) {
   return (
-    <div className="space-y-2 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-xs">
+    <div className="space-y-2 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-950">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5 font-semibold text-amber-900 dark:text-amber-100">
-          <HelpCircle className="size-3.5 text-amber-600 dark:text-amber-400" />
+        <div className="flex items-center gap-1.5 font-semibold text-amber-950">
+          <HelpCircle className="size-3.5 text-amber-700" />
           <span>Active TPA Query</span>
         </div>
         <CountdownChip deadlineAt={query.deadlineAt} />
       </div>
 
-      <p className="text-muted-foreground line-clamp-2 text-[11px]">{query.summary ?? query.subject}</p>
+      <p className="line-clamp-2 text-[11px] text-amber-900">{query.summary ?? query.subject}</p>
 
-      <div className="flex items-center justify-between border-t border-amber-500/10 pt-1 text-[11px]">
+      <div className="flex items-center justify-between border-t border-amber-200 pt-1 text-[11px]">
         <span className="text-muted-foreground">Received {formatDateTime(query.receivedAt)}</span>
         <Link
           href={`/inbox/${query.id}`}

@@ -55,7 +55,14 @@ export function WorklistToolbar({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <Select value={searchParams.get("payer") ?? "all"} onValueChange={(val) => updateParam("payer", val)}>
+        <Select
+          items={[
+            { value: "all", label: "All payers" },
+            ...payers.map((p) => ({ value: p.id, label: p.name })),
+          ]}
+          value={searchParams.get("payer") ?? "all"}
+          onValueChange={(val) => updateParam("payer", val)}
+        >
           <SelectTrigger className="h-9 w-40 text-xs">
             <SelectValue placeholder="All payers" />
           </SelectTrigger>
@@ -71,6 +78,10 @@ export function WorklistToolbar({
 
         {isHead && (
           <Select
+            items={[
+              { value: "all", label: "All assignees" },
+              ...assignees.map((a) => ({ value: a.id, label: a.name })),
+            ]}
             value={searchParams.get("assignee") ?? "all"}
             onValueChange={(val) => updateParam("assignee", val)}
           >

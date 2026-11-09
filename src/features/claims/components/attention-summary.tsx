@@ -11,7 +11,7 @@ export function AttentionSummary({ items, className }: { items: AttentionItem[];
     top.severity === "critical"
       ? "bg-danger"
       : top.severity === "warning"
-        ? "bg-warning"
+        ? "bg-amber-500"
         : "bg-muted-foreground";
 
   return (

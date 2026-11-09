@@ -15,7 +15,7 @@ export function SuggestionOptions({
 }) {
   return (
     <div className="space-y-2 pt-1">
-      <div className="text-warning flex items-center gap-1.5 text-[11px] font-medium">
+      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-amber-800">
         <span>Sources disagree — choose the verified value:</span>
       </div>
 

@@ -42,7 +42,7 @@ export function RequirementToggle({
           <ToggleGroupItem
             value="OPTIONAL"
             size="sm"
-            className="text-warning px-2.5 py-1 text-xs font-medium"
+            className="px-2.5 py-1 text-xs font-semibold text-amber-800"
           >
             Optional
           </ToggleGroupItem>

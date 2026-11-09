@@ -17,7 +17,9 @@ export function StatTile({
       <div className="mt-2 flex items-baseline justify-between gap-2">
         <span className="text-foreground font-mono text-2xl font-bold tracking-tight">{value}</span>
         {targetLine && (
-          <span className={`text-xs font-medium ${belowTarget ? "text-warning" : "text-muted-foreground"}`}>
+          <span
+            className={`text-xs ${belowTarget ? "font-semibold text-amber-800" : "text-muted-foreground font-medium"}`}
+          >
             {targetLine}
           </span>
         )}

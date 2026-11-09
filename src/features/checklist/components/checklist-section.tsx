@@ -12,7 +12,7 @@ function SlotStateIcon({ state, required }: { state: SlotState; required: boolea
     return <AlertTriangle className="text-danger size-4 shrink-0" />;
   }
   if (state === "STALE") {
-    return <AlertCircle className="text-warning size-4 shrink-0" />;
+    return <AlertCircle className="size-4 shrink-0 text-amber-700" />;
   }
   return required ? (
     <Circle className="text-danger size-4 shrink-0" />
@@ -91,7 +91,7 @@ export function ChecklistSection({
                     <span className="text-danger text-xs font-medium">Missing</span>
                   )}
                   {slot.state === "STALE" && (
-                    <span className="text-warning text-xs font-medium">Fresh copy needed</span>
+                    <span className="text-xs font-semibold text-amber-800">Fresh copy needed</span>
                   )}
                   {slot.state === "NEEDS_CHECK" && (
                     <span className="text-danger text-xs font-medium">Name mismatch</span>

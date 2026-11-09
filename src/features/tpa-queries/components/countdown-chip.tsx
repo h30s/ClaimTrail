@@ -49,8 +49,8 @@ export function CountdownChip({
           icon: CheckCircle,
           label: res.answeredOnTime ? "Answered · on time" : "Answered · late",
           className: res.answeredOnTime
-            ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-            : "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+            ? "border-emerald-300 bg-emerald-50 text-emerald-900 font-medium"
+            : "border-amber-300 bg-amber-50 text-amber-900 font-medium",
         };
       case "OVERDUE":
         return {
@@ -62,7 +62,7 @@ export function CountdownChip({
         return {
           icon: AlertTriangle,
           label: `Due soon · ${formatDuration(res.msLeft)}`,
-          className: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300 font-medium",
+          className: "border-amber-300 bg-amber-50 text-amber-950 font-semibold",
         };
       case "ON_TRACK":
         return {

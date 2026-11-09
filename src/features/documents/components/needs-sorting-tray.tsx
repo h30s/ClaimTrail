@@ -27,14 +27,14 @@ export function NeedsSortingTray({
   return (
     <div
       ref={setNodeRef}
-      className={`border-warning/50 bg-warning/5 rounded-lg border p-4 transition-colors ${
-        isOver ? "border-warning bg-warning/10 ring-warning/30 ring-2" : ""
+      className={`rounded-lg border border-amber-300 bg-amber-50/60 p-4 transition-colors ${
+        isOver ? "border-amber-400 bg-amber-100/70 ring-2 ring-amber-300" : ""
       }`}
     >
       <div className="flex items-center gap-2 pb-3">
-        <Inbox className="text-warning size-4" />
+        <Inbox className="size-4 text-amber-700" />
         <h3 className="text-foreground text-sm font-semibold">Needs sorting</h3>
-        <span className="bg-warning/20 text-warning-foreground rounded-full px-2 py-0.5 font-mono text-[11px] font-semibold">
+        <span className="rounded-full border border-amber-300 bg-amber-100 px-2 py-0.5 font-mono text-[11px] font-semibold text-amber-950">
           {documents.length}
         </span>
       </div>

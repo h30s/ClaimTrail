@@ -107,9 +107,15 @@ export function PatientPicker({
           <div className="space-y-1">
             <Label className="text-xs">Gender</Label>
             <Select
+              items={[
+                { value: "MALE", label: "Male" },
+                { value: "FEMALE", label: "Female" },
+                { value: "OTHER", label: "Other" },
+              ]}
               value={gender || null}
               onValueChange={(val) => {
-                if (val) setValue("patientGender", val as "MALE" | "FEMALE" | "OTHER");
+                if (val)
+                  setValue("patientGender", val as "MALE" | "FEMALE" | "OTHER", { shouldValidate: true });
               }}
             >
               <SelectTrigger className="h-8 text-xs">

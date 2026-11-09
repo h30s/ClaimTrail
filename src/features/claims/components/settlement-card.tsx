@@ -29,7 +29,7 @@ export function SettlementCard({ file }: { file: ClaimFileDto }) {
         </div>
         <div>
           <span className="text-muted-foreground block text-[11px]">Total Deductions</span>
-          <span className="text-warning font-mono font-medium">
+          <span className="font-mono font-semibold text-amber-800">
             {totalDeductions > 0 ? formatInr(totalDeductions) : "₹0"}
           </span>
         </div>

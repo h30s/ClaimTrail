@@ -47,7 +47,7 @@ export function DroppableSlot({
         <div className="flex min-w-0 items-center gap-2">
           {slot.state === "SATISFIED" && <CheckCircle2 className="text-success size-4 shrink-0" />}
           {slot.state === "NEEDS_CHECK" && <AlertTriangle className="text-danger size-4 shrink-0" />}
-          {slot.state === "STALE" && <AlertCircle className="text-warning size-4 shrink-0" />}
+          {slot.state === "STALE" && <AlertCircle className="size-4 shrink-0 text-amber-700" />}
           {slot.state === "MISSING" &&
             (isReq ? (
               <Circle className="text-danger size-4 shrink-0" />
@@ -68,7 +68,7 @@ export function DroppableSlot({
           )}
           {slot.state === "MISSING" && <span className="text-danger text-[11px] font-medium">Missing</span>}
           {slot.state === "STALE" && (
-            <span className="text-warning text-[11px] font-medium">Fresh copy needed</span>
+            <span className="text-[11px] font-semibold text-amber-800">Fresh copy needed</span>
           )}
           {slot.state === "NEEDS_CHECK" && (
             <span className="text-danger text-[11px] font-medium">Name mismatch</span>

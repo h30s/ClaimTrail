@@ -37,14 +37,14 @@ export function AttentionStrip({
           item.severity === "critical"
             ? "bg-danger"
             : item.severity === "warning"
-              ? "bg-warning"
+              ? "bg-amber-500"
               : "bg-muted-foreground";
 
         const bgHover =
           item.severity === "critical"
             ? "hover:border-danger/40 hover:bg-danger-soft/20"
             : item.severity === "warning"
-              ? "hover:border-warning/40 hover:bg-warning-soft/20"
+              ? "hover:border-amber-400 hover:bg-amber-50"
               : "hover:border-border hover:bg-muted/40";
 
         return (

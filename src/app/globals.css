@@ -2,6 +2,8 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme inline {
   --font-sans: var(--font-plex-sans), system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), monospace;
@@ -20,8 +22,9 @@
 
   --color-danger: oklch(0.53 0.19 27);
   --color-danger-soft: oklch(0.97 0.018 27);
-  --color-warning: oklch(0.5 0.115 60);
-  --color-warning-soft: oklch(0.975 0.03 85);
+  --color-warning: oklch(0.42 0.13 65);
+  --color-warning-foreground: oklch(0.2 0.05 65);
+  --color-warning-soft: oklch(0.96 0.035 85);
   --color-success: oklch(0.5 0.1 155);
   --color-success-soft: oklch(0.97 0.022 155);
 

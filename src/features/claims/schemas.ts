@@ -13,13 +13,19 @@ export type WorklistParams = z.infer<typeof WorklistParamsSchema>;
 export const CreateClaimSchema = z
   .object({
     patientId: z.string().optional(),
-    patientName: z.string().min(2, "Name must be at least 2 characters").optional(),
+    patientName: z
+      .string()
+      .optional()
+      .refine((v) => !v || v.length >= 2, "Name must be at least 2 characters"),
     patientGender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
     patientDob: z
       .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, "Format: YYYY-MM-DD")
-      .optional(),
-    patientUhid: z.string().min(3, "UHID must be at least 3 characters").optional(),
+      .optional()
+      .refine((v) => !v || /^\d{4}-\d{2}-\d{2}$/.test(v), "Format: YYYY-MM-DD"),
+    patientUhid: z
+      .string()
+      .optional()
+      .refine((v) => !v || v.length >= 3, "UHID must be at least 3 characters"),
 
     payerId: z.string().min(1, "Select a payer"),
     procedureId: z.string().min(1, "Select a procedure"),
@@ -32,7 +38,8 @@ export const CreateClaimSchema = z
   })
   .refine(
     (data) =>
-      data.patientId || (data.patientName && data.patientGender && data.patientDob && data.patientUhid),
+      Boolean(data.patientId) ||
+      Boolean(data.patientName && data.patientGender && data.patientDob && data.patientUhid),
     {
       message: "Patient details are required when creating a new patient",
       path: ["patientName"],

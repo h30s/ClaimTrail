@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import type { PayerDto, ProcedureDto } from "@/features/catalog/server/queries";
 import { applyFieldErrors } from "@/hooks/apply-field-errors";
@@ -71,8 +72,13 @@ export function NewClaimForm({
     }
   };
 
+  const onError = (fieldErrors: typeof errors) => {
+    const first = Object.values(fieldErrors)[0]?.message;
+    if (first) toast.error(String(first));
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-6">
+    <form onSubmit={handleSubmit(onSubmit, onError)} className="max-w-2xl space-y-6">
       <div className="border-border bg-surface space-y-3 rounded-lg border p-4">
         <h2 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">1. Patient</h2>
         <PatientPicker

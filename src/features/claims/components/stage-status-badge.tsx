@@ -14,7 +14,7 @@ export function StageStatusBadge({
 }) {
   const dotColor =
     status === "QUERY"
-      ? "bg-warning"
+      ? "bg-amber-500"
       : status === "REJECTED"
         ? "bg-danger"
         : status === "APPROVED" || status === "SETTLED"
