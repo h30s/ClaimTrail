@@ -11,6 +11,7 @@ import { seedClaims } from "./seed-claims";
 import { seedDocuments } from "./seed-documents";
 import { seedQueries } from "./seed-queries";
 import { seedSettledClaims } from "./seed-settled-claims";
+import { seedAuditEvents } from "./seed-audit";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
@@ -154,6 +155,9 @@ async function main() {
 
   // 9. Historical Settled Claims & Analytics
   await seedSettledClaims(db, { userMap, payerMap, procedureMap, docTypeMap });
+
+  // 10. Compliance Audit Trail
+  await seedAuditEvents(db, { userMap });
 
   console.log("Database seeded successfully.");
 }

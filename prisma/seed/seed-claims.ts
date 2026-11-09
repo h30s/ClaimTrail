@@ -89,5 +89,17 @@ export async function seedClaims(
     }
   }
 
+  // Demo patient for Scene 4 claim creation walkthrough
+  await db.patient.upsert({
+    where: { uhid: "UHID-2025289" },
+    update: {},
+    create: {
+      name: "Suresh Jadhav",
+      gender: "MALE",
+      uhid: "UHID-2025289",
+      dateOfBirth: new Date(1982, 3, 12),
+    },
+  });
+
   console.log(`✓ Seeded ${SEED_CLAIMS.length} open claims with full event timelines.`);
 }

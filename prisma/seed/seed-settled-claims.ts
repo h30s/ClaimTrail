@@ -33,8 +33,10 @@ export async function seedSettledClaims(
     const payerId = ctx.payerMap.get(item.payerName)!;
     const procedureId = ctx.procedureMap.get(item.procedureName)!;
 
-    const patient = await db.patient.create({
-      data: {
+    const patient = await db.patient.upsert({
+      where: { uhid: item.uhid },
+      update: {},
+      create: {
         name: item.patientName,
         uhid: item.uhid,
         gender: item.patientGender,

@@ -11,11 +11,7 @@ export const SEED_BRIEF_CLAIMS: readonly ClaimSeed[] = [
     treatingDoctor: "Dr. Anand Kale",
     estimatedAmount: 85000,
     assigneeEmail: "arjun.patil@claimtrail.example",
-    story: [
-      { event: "CREATED", minutesAgo: 250 },
-      { event: "SUBMIT", minutesAgo: 210, note: "Patient in pain, USG booked for this afternoon" },
-      { event: "RAISE_QUERY", minutesAgo: 140 },
-    ],
+    story: [{ event: "CREATED", minutesAgo: 250 }],
   },
   // 2. CLM-3382
   {

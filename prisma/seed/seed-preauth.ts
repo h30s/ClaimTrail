@@ -10,9 +10,10 @@ export async function seedPreauthFields(
 ) {
   const { arjunId, docsByFileName } = params;
 
-  // 1. CLM-3381: All 12 fields confirmed
+  // 1. CLM-3381: 11 fields confirmed, provisionalDiagnosis suggested with source quote
   const clm3381 = await db.claim.findFirst({ where: { code: "CLM-3381" } });
   const doc3381 = docsByFileName.get("preauth-form-rajendra-pawar.pdf");
+  const docNotes3381 = docsByFileName.get("admission-notes-rajendra-pawar.pdf");
 
   if (clm3381 && doc3381) {
     const fieldValues: Record<string, string> = {
@@ -32,27 +33,36 @@ export async function seedPreauthFields(
 
     for (const f of PREAUTH_FIELDS) {
       const val = fieldValues[f.key] ?? "N/A";
+      const isDiagnosis = f.key === "provisionalDiagnosis";
+      const sourceDoc = isDiagnosis && docNotes3381 ? docNotes3381 : doc3381;
+      const snippet = isDiagnosis
+        ? "Provisional Diagnosis: Acute calculous cholecystitis, tender RUQ, positive Murphy sign"
+        : `${f.label}: ${val}`;
+
       const suggestion = await db.fieldSuggestion.create({
         data: {
           claimId: clm3381.id,
-          documentId: doc3381.id,
+          documentId: sourceDoc.id,
           fieldKey: f.key,
           value: val,
-          sourceSnippet: `${f.label}: ${val}`,
+          sourceSnippet: snippet,
           confidence: 0.96,
         },
       });
 
-      await db.claimField.create({
-        data: {
-          claimId: clm3381.id,
-          fieldKey: f.key,
-          value: val,
-          suggestionId: suggestion.id,
-          confirmedById: arjunId,
-          confirmedAt: doc3381.uploadedAt,
-        },
-      });
+      // Keep provisionalDiagnosis as SUGGESTED so Scene 8 can demonstrate confirming it
+      if (!isDiagnosis) {
+        await db.claimField.create({
+          data: {
+            claimId: clm3381.id,
+            fieldKey: f.key,
+            value: val,
+            suggestionId: suggestion.id,
+            confirmedById: arjunId,
+            confirmedAt: doc3381.uploadedAt,
+          },
+        });
+      }
     }
   }
 

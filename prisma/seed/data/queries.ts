@@ -25,52 +25,39 @@ export type SeedQueryDef = {
 };
 
 export const SEED_QUERY_SPECS: SeedQueryDef[] = [
-  // Q1: CLM-3381 - Company B (TPA), Gall bladder removal, Rajendra Pawar
-  // Received 2h 20m ago (140 min ago), deadline +6h -> due in ~3h 40m
+  // Q1: CLM-3384 - Company F, Suresh Wagh (Amber countdown chip: due in ~75 min)
+  // Received 105 min ago, stated deadline 3 hours (180 min) -> 75 min remaining (< 2h)
   {
     key: "Q1",
-    fromAddress: "queries@company-b.example",
-    payerName: "Company B",
-    claimCode: "CLM-3381",
+    fromAddress: "queries@company-f.example",
+    payerName: "Company F",
+    claimCode: "CLM-3384",
     suggestedClaimCode: null,
-    minutesAgo: 140,
-    subject: "Ref: CLM-3381 / Rajendra Pawar - Additional Medical Information Required",
+    minutesAgo: 105,
+    subject: "Ref: CLM-3384 / Suresh Wagh - Urgent Stent Specification Clarification",
     body: `Dear Hospital Insurance Desk,
 
-Ref: CLM-3381 / Rajendra Pawar (UHID: NSK-204518)
-Policy: POL-B-991024
+Ref: CLM-3384 / Suresh Wagh (UHID: NSK-204504)
+Policy: DEMO-F-551029
 
-We are reviewing the cashless pre-authorization request for the planned Laparoscopic Cholecystectomy.
-Before processing approval, please share the following:
-1. USG abdomen report supporting the clinical diagnosis of acute cholecystitis with cholelithiasis.
-2. Please confirm the exact duration of present symptoms and previous episodes of abdominal pain.
-
-Kindly submit these requirements within 6 hours to process the cashless request without delay.
+Please provide the coronary angiography report and stent technical specification before authorization.
+Respond within 3 hours to avoid turnaround breach.
 
 Regards,
-Medical Query Desk
-Company B Health TPA`,
-    summary: "Company B requests USG abdomen report and confirmation of symptom duration within 6 hours.",
-    extractedClaimRef: "CLM-3381",
-    extractedPatient: "Rajendra Pawar",
+Company F TPA Desk`,
+    summary: "Company F requires angiography report and stent specifications within 3 hours.",
+    extractedClaimRef: "CLM-3384",
+    extractedPatient: "Suresh Wagh",
     deadlineSource: "STATED",
-    statedSnippet: "within 6 hours",
-    deadlineMinutesOffset: 360, // 6 hours
+    statedSnippet: "within 3 hours",
+    deadlineMinutesOffset: 180, // 3 hours
     status: "OPEN",
     asks: [
       {
         position: 1,
-        text: "USG abdomen report supporting diagnosis of cholecystitis",
-        documentTypeKey: "ULTRASOUND_REPORT",
-        sourceSnippet:
-          "USG abdomen report supporting the clinical diagnosis of acute cholecystitis with cholelithiasis",
-      },
-      {
-        position: 2,
-        text: "Confirm duration of symptoms and previous pain episodes",
-        documentTypeKey: null,
-        sourceSnippet:
-          "confirm the exact duration of present symptoms and previous episodes of abdominal pain",
+        text: "Angiography report and stent technical specification",
+        documentTypeKey: "ANGIOGRAPHY_REPORT",
+        sourceSnippet: "coronary angiography report and stent technical specification",
       },
     ],
   },
