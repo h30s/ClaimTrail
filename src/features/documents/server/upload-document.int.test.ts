@@ -94,5 +94,5 @@ describe("Document Upload (Integration)", () => {
       },
     });
     expect(audit).not.toBeNull();
-  }, 30_000);
+  });
 });
